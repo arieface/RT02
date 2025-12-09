@@ -213,7 +213,7 @@ function updateConnectionStatus(status) {
         case 'offline':
             signalElement.classList.add('offline');
             signalText.textContent = 'Offline';
-            statusElement.innerHTML = '<i class="fas fa-circle" style="color:#ef4444"></i> <span>Server sedang offline</span>';
+            statusElement.innerHTML = '<i class="fas fa-circle" style="color:#ef4444"></i> <span>Server offline</span>';
             statusElement.classList.add('offline');
             break;
             
