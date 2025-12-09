@@ -387,7 +387,7 @@ window.testError = function(type) {
             updateConnectionStatus('timeout');
             break;
         case 'error':
-            showError('Offline • Coba lagi nanti');
+            showError('Offline • mencoba menghubungkan');
             updateConnectionStatus('error');
             break;
         case 'loading':
@@ -397,7 +397,7 @@ window.testError = function(type) {
             updateSaldoDisplay({
                 raw: "Rp 15.000.000",
                 numeric: 15000000,
-                formatted: "15.000.000"
+                formatted: "15,000.000"
             });
             updateConnectionStatus('online');
             break;
