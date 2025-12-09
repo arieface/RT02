@@ -58,16 +58,16 @@ async function fetchSaldo() {
         
         if (error.name === 'AbortError') {
             updateConnectionStatus('timeout');
-            showError('Timeout - server tidak merespon');
+            showError('Coba lagi - server lambat');
         } else if (!navigator.onLine) {
             updateConnectionStatus('offline');
-            showError('Anda sedang offline');
+            showError('Offline - cek koneksi');
         } else if (error.message.includes('HTTP')) {
             updateConnectionStatus('error');
             showError('Database tidak dapat diakses');
         } else {
             updateConnectionStatus('error');
-            showError('Gagal memuat data');
+            showError('Offline • Coba lagi nanti');
         }
         
         // Retry logic
@@ -84,7 +84,7 @@ async function fetchSaldo() {
     }
 }
 
-// ==================== FUNGSI PEMROSESAN DATA YANG DIPERBAIKI ====================
+// ==================== FUNGSI PEMROSESAN DATA ====================
 function processSaldoData(rawData) {
     console.log("🔧 Memproses data:", rawData);
     
@@ -139,7 +139,7 @@ function processSaldoData(rawData) {
     };
 }
 
-// ==================== FUNGSI UI YANG DIPERBAIKI ====================
+// ==================== FUNGSI UI ====================
 function updateSaldoDisplay(data) {
     const saldoElement = document.getElementById('saldo');
     if (!saldoElement) return;
@@ -178,6 +178,7 @@ function showLoadingState() {
     }
 }
 
+// PERBAIKAN: Update connection status text
 function updateConnectionStatus(status) {
     const signalElement = document.getElementById('connection-signal');
     const signalText = document.getElementById('signal-text');
@@ -219,21 +220,39 @@ function updateConnectionStatus(status) {
         case 'error':
             signalElement.classList.add('offline');
             signalText.textContent = 'Error';
-            statusElement.innerHTML = '<i class="fas fa-circle" style="color:#ef4444"></i> <span>Gagal menghubungkan</span>';
+            // PERBAIKAN: Ganti teks error
+            statusElement.innerHTML = '<i class="fas fa-circle" style="color:#ef4444"></i> <span>Offline • Coba lagi nanti</span>';
             statusElement.classList.add('offline');
             break;
     }
 }
 
+// PERBAIKAN: Ganti teks error
 function showError(message) {
     const saldoElement = document.getElementById('saldo');
     if (!saldoElement) return;
     
-    saldoElement.textContent = message;
+    // Ganti "Gagal" dengan "Coba" dan "Error" dengan "Offline"
+    let displayMessage = message;
+    
+    if (message.includes('Gagal')) {
+        displayMessage = message.replace('Gagal', 'Coba');
+    }
+    if (message.includes('Error')) {
+        displayMessage = message.replace('Error', 'Offline');
+    }
+    if (message.includes('gagal')) {
+        displayMessage = message.replace('gagal', 'coba');
+    }
+    if (message.includes('error')) {
+        displayMessage = message.replace('error', 'offline');
+    }
+    
+    saldoElement.textContent = displayMessage;
     saldoElement.className = 'amount error';
 }
 
-// ==================== FUNGSI UPDATE TIME YANG DIPERBAIKI ====================
+// ==================== FUNGSI UPDATE TIME ====================
 function updateTime() {
     const now = new Date();
     const gmt7Time = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Jakarta"}));
@@ -261,7 +280,7 @@ function updateTime() {
     const namaBulanSekarang = namaBulan[bulanIndex];
     
     // Format: Selasa, 10 Desember 2024 ~ 14:30:45 WIB
-    const timeString = `${namaHariSekarang}, ${hari} ${namaBulanSekarang} ${tahun} • ${jam}:${menit}:${detik} WIB`;
+    const timeString = `${namaHariSekarang}, ${hari} ${namaBulanSekarang} ${tahun} ~ ${jam}:${menit}:${detik} WIB`;
     
     const waktuElement = document.getElementById('waktu');
     if (waktuElement) {
@@ -281,12 +300,16 @@ function checkConnection() {
         }
     } else {
         updateConnectionStatus('offline');
+        showError('Offline - cek koneksi Anda');
     }
 }
 
 // ==================== INISIALISASI ====================
 document.addEventListener('DOMContentLoaded', function() {
     console.log("🚀 Aplikasi Kas RT02-RW18 dimulai...");
+    
+    // Update stat "24 Jam Online" (PERBAIKAN 5)
+    updateStatsDisplay();
     
     // Cek koneksi awal
     checkConnection();
@@ -313,6 +336,22 @@ document.addEventListener('DOMContentLoaded', function() {
     setInterval(checkConnection, 30000);
 });
 
+// ==================== FUNGSI TAMBAHAN ====================
+function updateStatsDisplay() {
+    // PERBAIKAN 5: Update stat "24 Jam Online"
+    const statItems = document.querySelectorAll('.stat-item');
+    if (statItems.length >= 2) {
+        const timeStat = statItems[1];
+        const statValue = timeStat.querySelector('.stat-value');
+        const statLabel = timeStat.querySelector('.stat-label');
+        
+        if (statValue && statLabel) {
+            statValue.textContent = '24/7';
+            statLabel.textContent = 'Online';
+        }
+    }
+}
+
 // ==================== FUNGSI DEBUG (untuk console) ====================
 window.debugFetch = function() {
     console.log("🔧 Debug: Manual fetch");
@@ -325,4 +364,42 @@ window.debugCheckData = function() {
     console.log("Retry Count:", retryCount);
     console.log("Last Fetch:", lastSuccessfulFetch);
     console.log("Is Online:", isOnline);
+    console.log("Database URL:", DATABASE_URL);
+};
+
+window.manualUpdateTime = function() {
+    console.log("🔧 Debug: Manual update time");
+    updateTime();
+};
+
+// Fungsi untuk testing error messages
+window.testError = function(type) {
+    const saldoElement = document.getElementById('saldo');
+    if (!saldoElement) return;
+    
+    switch(type) {
+        case 'offline':
+            showError('Offline - cek koneksi internet');
+            updateConnectionStatus('offline');
+            break;
+        case 'timeout':
+            showError('Coba lagi - server lambat');
+            updateConnectionStatus('timeout');
+            break;
+        case 'error':
+            showError('Offline • Coba lagi nanti');
+            updateConnectionStatus('error');
+            break;
+        case 'loading':
+            showLoadingState();
+            break;
+        case 'success':
+            updateSaldoDisplay({
+                raw: "Rp 15.000.000",
+                numeric: 15000000,
+                formatted: "15.000.000"
+            });
+            updateConnectionStatus('online');
+            break;
+    }
 };
