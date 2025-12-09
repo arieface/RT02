@@ -1,0 +1,705 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow-x: hidden;
+    padding: 20px;
+}
+
+.background-3d {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    perspective: 1000px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.floating-shapes {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.shape {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    animation: float 15s infinite ease-in-out;
+    pointer-events: none;
+}
+
+.shape-1 {
+    width: 250px;
+    height: 250px;
+    top: 15%;
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.shape-2 {
+    width: 180px;
+    height: 180px;
+    bottom: 20%;
+    right: 12%;
+    animation-delay: 5s;
+}
+
+.shape-3 {
+    width: 120px;
+    height: 120px;
+    top: 65%;
+    left: 85%;
+    animation-delay: 10s;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-20px) rotate(180deg);
+    }
+}
+
+/* Container utama untuk centering */
+.app-container {
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    margin: 0 auto;
+}
+
+.card-3d {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 24px;
+    padding: 25px;
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.15),
+        0 15px 30px rgba(0, 0, 0, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    transform-style: preserve-3d;
+    animation: cardEntrance 0.8s ease-out;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    max-width: 480px;
+}
+
+.card-3d::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    border-radius: 24px 24px 0 0;
+}
+
+@keyframes cardEntrance {
+    from {
+        opacity: 0;
+        transform: translateY(50px) rotateX(10deg);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) rotateX(0);
+    }
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo i {
+    font-size: 2rem;
+    color: #667eea;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 4px rgba(102, 126, 234, 0.3));
+}
+
+h1 {
+    color: #2d3748;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+}
+
+/* Ganti badge dengan connection signal */
+.connection-signal {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    color: #475569;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.signal-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 14px;
+}
+
+.signal-bar {
+    width: 3px;
+    background: #22c55e;
+    border-radius: 1px;
+    animation: signalPulse 2s infinite ease-in-out;
+}
+
+.signal-bar:nth-child(1) { height: 4px; animation-delay: 0s; }
+.signal-bar:nth-child(2) { height: 7px; animation-delay: 0.2s; }
+.signal-bar:nth-child(3) { height: 10px; animation-delay: 0.4s; }
+.signal-bar:nth-child(4) { height: 13px; animation-delay: 0.6s; }
+
+@keyframes signalPulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+.connection-signal.offline .signal-bar {
+    background: #ef4444;
+}
+
+.info-card-3d {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    border-radius: 18px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 
+        0 10px 25px rgba(0, 0, 0, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    transform-style: preserve-3d;
+    position: relative;
+    overflow: hidden;
+}
+
+.info-card-3d::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transform: translateX(-100%);
+}
+
+.info-card-3d:hover::after {
+    animation: shine 1.5s;
+}
+
+@keyframes shine {
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.card-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 15px;
+    color: #64748b;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.card-label i {
+    color: #667eea;
+    font-size: 1rem;
+}
+
+.saldo-display {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 15px;
+    min-height: 60px;
+    flex-wrap: wrap;
+}
+
+.currency {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #667eea;
+    text-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
+}
+
+.amount {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #1e293b;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #1e293b, #475569);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    word-break: break-word;
+    max-width: 100%;
+    overflow: hidden;
+    text-align: center;
+    position: relative;
+}
+
+/* Efek kilau pada angka saldo */
+.amount::after {
+    content: '';
+    position: absolute;
+    top: -10%;
+    left: -10%;
+    right: -10%;
+    bottom: -10%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3) 20%,
+        rgba(255, 255, 255, 0.6) 50%,
+        rgba(255, 255, 255, 0.3) 80%,
+        transparent
+    );
+    transform: translateX(-100%);
+    animation: shimmer 3s infinite;
+    pointer-events: none;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.amount.error {
+    font-size: 1.2rem;
+    color: #ef4444;
+    background: none;
+    -webkit-text-fill-color: #ef4444;
+    font-weight: 600;
+    animation: shake 0.5s ease;
+}
+
+.amount.empty {
+    font-size: 1.2rem;
+    color: #f59e0b;
+    background: none;
+    -webkit-text-fill-color: #f59e0b;
+    font-weight: 600;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+/* REVISI: Background time-card silver terang */
+.time-card-3d {
+    background: linear-gradient(145deg, #f0f0f0, #e0e0e0);
+    color: #1f2937;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 20px;
+    box-shadow: 
+        0 12px 30px rgba(0, 0, 0, 0.15),
+        inset 0 1px 1px rgba(255, 255, 255, 0.8),
+        inset 0 -1px 1px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(220, 220, 220, 0.8);
+    border: 1px solid rgba(200, 200, 200, 0.6);
+    position: relative;
+    overflow: hidden;
+}
+
+.time-card-3d::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, 
+        #c0c0c0, 
+        #f0f0f0, 
+        #ffffff,
+        #f0f0f0,
+        #c0c0c0);
+    border-radius: 16px 16px 0 0;
+    opacity: 0.9;
+    box-shadow: 
+        0 2px 15px rgba(192, 192, 192, 0.5),
+        0 0 25px rgba(255, 255, 255, 0.4);
+}
+
+.time-card-3d::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        45deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.4) 50%,
+        transparent 70%
+    );
+    pointer-events: none;
+    opacity: 0.3;
+    animation: shine 3s infinite linear;
+}
+
+@keyframes shine {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+.time-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    color: #4b5563;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+}
+
+.time-label i {
+    color: #6b7280;
+    font-size: 0.9rem;
+    text-shadow: 
+        0 1px 3px rgba(255, 255, 255, 0.8),
+        0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.time-display {
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-align: center;
+    color: #111827;
+    letter-spacing: 0.5px;
+    font-variant-numeric: tabular-nums;
+    min-height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.4;
+    text-shadow: 
+        0 1px 3px rgba(255, 255, 255, 0.8),
+        0 0 15px rgba(255, 255, 255, 0.4);
+}
+.stats {
+    display: flex;
+    justify-content: space-around;
+    background: rgba(241, 245, 249, 0.8);
+    border-radius: 14px;
+    padding: 15px;
+    margin-bottom: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(226, 232, 240, 0.5);
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 100px;
+    justify-content: center;
+}
+
+.stat-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1rem;
+    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: #64748b;
+    font-weight: 500;
+    margin-top: 2px;
+}
+
+.stat-divider {
+    width: 1px;
+    background: rgba(203, 213, 224, 0.5);
+    margin: 0 8px;
+}
+
+.footer-3d {
+    text-align: center;
+    color: #64748b;
+    font-size: 0.85rem;
+    width: 100%;
+}
+
+.footer-3d p {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 0.8rem;
+}
+
+.watermark {
+    text-align: center;
+    margin-top: 25px;
+    color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.loading-dots {
+    display: inline-flex;
+    gap: 3px;
+}
+
+.loading-dots span {
+    animation: dotPulse 1.5s infinite ease-in-out;
+    opacity: 0;
+    font-size: 1rem;
+}
+
+.loading-dots span:nth-child(1) { animation-delay: 0s; }
+.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes dotPulse {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
+}
+
+/* Status koneksi yang lebih baik */
+.connection-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+    font-size: 0.8rem;
+    color: #64748b;
+    opacity: 0.8;
+}
+
+.connection-status i {
+    font-size: 0.7rem;
+}
+
+.connection-status.online i {
+    color: #10b981;
+}
+
+.connection-status.offline i {
+    color: #ef4444;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+/* Loading animation */
+.loading-dots-container {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    height: 40px;
+}
+
+.loading-dots-container span {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #667eea;
+    animation: dotBounce 1.4s infinite ease-in-out both;
+}
+
+.loading-dots-container span:nth-child(1) { 
+    animation-delay: -0.32s; 
+}
+.loading-dots-container span:nth-child(2) { 
+    animation-delay: -0.16s; 
+}
+.loading-dots-container span:nth-child(3) { 
+    animation-delay: 0s; 
+}
+
+@keyframes dotBounce {
+    0%, 80%, 100% { 
+        transform: scale(0);
+        opacity: 0.5;
+    }
+    40% { 
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+    body {
+        padding: 15px;
+        justify-content: flex-start;
+        min-height: 100vh;
+    }
+    
+    .app-container {
+        margin-top: 10px;
+    }
+    
+    .card-3d {
+        padding: 20px;
+        margin: 0 auto;
+    }
+    
+    h1 {
+        font-size: 1.3rem;
+    }
+    
+    .logo i {
+        font-size: 1.8rem;
+    }
+    
+    .amount {
+        font-size: 1.8rem;
+    }
+    
+    .amount.error,
+    .amount.empty {
+        font-size: 1rem;
+    }
+    
+    .currency {
+        font-size: 1.5rem;
+    }
+    
+    .time-display {
+        font-size: 0.95rem;
+        line-height: 1.3;
+    }
+    
+    .stats {
+        flex-direction: column;
+        gap: 15px;
+        padding: 12px;
+    }
+    
+    .stat-divider {
+        width: 100%;
+        height: 1px;
+        margin: 5px 0;
+    }
+    
+    .stat-item {
+        justify-content: center;
+        min-width: auto;
+    }
+    
+    .connection-signal {
+        font-size: 0.7rem;
+        padding: 4px 8px;
+    }
+    
+    .signal-bar {
+        width: 2px;
+    }
+    
+    .signal-bar:nth-child(1) { height: 3px; }
+    .signal-bar:nth-child(2) { height: 5px; }
+    .signal-bar:nth-child(3) { height: 7px; }
+    .signal-bar:nth-child(4) { height: 9px; }
+}
+
+@media (min-width: 768px) {
+    .app-container {
+        max-width: 500px;
+    }
+    
+    .card-3d {
+        max-width: 500px;
+    }
+}
+
+/* Untuk desktop besar */
+@media (min-width: 1200px) {
+    .app-container {
+        max-width: 520px;
+    }
+}

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cek Saldo Online Kas RT02-RW18</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="background-3d">
+        <div class="floating-shapes">
+            <div class="shape shape-1"></div>
+            <div class="shape shape-2"></div>
+            <div class="shape shape-3"></div>
+        </div>
+        
+        <div class="app-container">
+            <div class="card-3d">
+                <div class="card-header">
+                    <div class="logo">
+                        <i class="fas fa-hand-holding-usd"></i>
+                        <h1>Kas RT02-RW18</h1>
+                    </div>
+                    <!-- Ganti badge dengan signal connection -->
+                    <div class="connection-signal" id="connection-signal">
+                        <div class="signal-bars">
+                            <div class="signal-bar"></div>
+                            <div class="signal-bar"></div>
+                            <div class="signal-bar"></div>
+                            <div class="signal-bar"></div>
+                        </div>
+                        <span id="signal-text">Online</span>
+                    </div>
+                </div>
+                
+                <div class="info-card-3d">
+                    <div class="card-label">
+                        <i class="fas fa-wallet"></i>
+                        <span>Saldo Kas Tersedia</span>
+                    </div>
+                    <div class="saldo-display" id="saldo-container">
+                        <div class="currency">Rp</div>
+                        <div class="amount" id="saldo">Memuat saldo...</div>
+                    </div>
+                    <div class="connection-status" id="connection-status">
+                        <i class="fas fa-circle"></i>
+                        <span>Menyinkronkan dengan database...</span>
+                    </div>
+                </div>
+                
+                <div class="time-card-3d">
+                    <div class="time-label">
+                        <i class="fas fa-clock"></i>
+                        <span>Terakhir Diperbarui</span>
+                    </div>
+                    <div class="time-display" id="waktu">-</div>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="fas fa-home"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value">39</span>
+                            <span class="stat-label">Rumah</span>
+                        </div>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value">2025</span>
+                            <span class="stat-label">Dimulai</span>
+                        </div>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value">100%</span>
+                            <span class="stat-label">Transparan</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="footer-3d">
+                    <p><i class="fas fa-info-circle"></i> Data diperbarui otomatis setiap 5 menit</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="watermark">
+            <i class="fas fa-home"></i>
+            <span>RT02-RW18 Digital ~ by Arief (Aace)</span>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
