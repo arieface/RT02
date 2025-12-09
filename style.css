@@ -252,25 +252,29 @@ h1 {
     font-size: 1rem;
 }
 
+/* ==================== PERBAIKAN 1: Rp dan Saldo 1 baris ==================== */
 .saldo-display {
     display: flex;
-    align-items: center;
+    align-items: baseline; /* Ini penting untuk sejajar */
     justify-content: center;
-    gap: 8px;
+    gap: 5px;
     margin-bottom: 12px;
     min-height: 50px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap; /* Jangan wrap ke bawah */
+    white-space: nowrap; /* Jangan wrap teks */
 }
 
 .currency {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
     font-weight: 700;
     color: #667eea;
     text-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
+    align-self: flex-start; /* Sejajarkan dengan bagian atas angka */
+    margin-top: 0.2rem; /* Sesuaikan vertikal */
 }
 
 .amount {
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: 800;
     color: #1e293b;
     letter-spacing: -0.5px;
@@ -278,12 +282,15 @@ h1 {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     text-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-    word-break: break-word;
-    max-width: 100%;
+    word-break: keep-all; /* Jangan pecah kata */
     overflow: hidden;
     text-align: center;
     position: relative;
-    line-height: 1.2;
+    line-height: 1;
+    white-space: nowrap; /* Jangan wrap */
+    max-width: 100%;
+    overflow-x: auto; /* Scroll horizontal jika perlu */
+    overflow-y: hidden;
 }
 
 /* Efek kilau pada angka saldo */
@@ -323,6 +330,7 @@ h1 {
     -webkit-text-fill-color: #ef4444;
     font-weight: 600;
     animation: shake 0.5s ease;
+    white-space: normal; /* Untuk error boleh wrap */
 }
 
 .amount.empty {
@@ -331,6 +339,7 @@ h1 {
     background: none;
     -webkit-text-fill-color: #f59e0b;
     font-weight: 600;
+    white-space: normal; /* Untuk empty boleh wrap */
 }
 
 @keyframes shake {
@@ -439,6 +448,7 @@ h1 {
         0 0 15px rgba(255, 255, 255, 0.4);
 }
 
+/* ==================== PERBAIKAN 2 & 3: Stats Horizontal ==================== */
 .stats {
     display: flex;
     justify-content: space-around;
@@ -448,14 +458,16 @@ h1 {
     margin-bottom: 15px;
     backdrop-filter: blur(10px);
     border: 1px solid rgba(226, 232, 240, 0.5);
+    flex-wrap: nowrap; /* Jangan wrap ke bawah */
 }
 
 .stat-item {
     display: flex;
     align-items: center;
     gap: 8px;
-    min-width: 90px;
+    min-width: auto;
     justify-content: center;
+    flex-direction: row; /* Pastikan horizontal */
 }
 
 .stat-icon {
@@ -469,19 +481,22 @@ h1 {
     color: white;
     font-size: 0.9rem;
     box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+    flex-shrink: 0; /* Jangan mengecil */
 }
 
 .stat-info {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    text-align: center;
+    align-items: flex-start; /* Rata kiri untuk 1 baris */
+    text-align: left;
+    white-space: nowrap; /* Jangan wrap */
 }
 
 .stat-value {
     font-size: 1.1rem;
     font-weight: 700;
     color: #1e293b;
+    line-height: 1.2;
 }
 
 .stat-label {
@@ -489,12 +504,15 @@ h1 {
     color: #64748b;
     font-weight: 500;
     margin-top: 2px;
+    line-height: 1.1;
 }
 
 .stat-divider {
     width: 1px;
+    height: 35px; /* Tinggi sesuai dengan stat-item */
     background: rgba(203, 213, 224, 0.5);
     margin: 0 5px;
+    align-self: center; /* Tengah secara vertikal */
 }
 
 .footer-3d {
@@ -637,7 +655,7 @@ h1 {
     }
     
     .floating-shapes {
-        display: none; /* Sembunyikan untuk performa mobile */
+        display: none;
     }
     
     .app-container {
@@ -705,27 +723,38 @@ h1 {
         margin-bottom: 10px;
     }
     
+    /* ==================== PERBAIKAN 1 UNTUK MOBILE ==================== */
     .saldo-display {
-        flex-direction: column;
-        gap: 5px;
+        flex-direction: row; /* Pastikan horizontal */
+        gap: 3px;
         margin-bottom: 10px;
-        min-height: 45px;
+        min-height: 40px;
+        flex-wrap: nowrap;
+        justify-content: center;
+        align-items: baseline;
     }
     
     .currency {
-        font-size: 1.5rem;
-        margin-bottom: 2px;
+        font-size: 1.4rem;
+        align-self: baseline;
+        margin-top: 0;
     }
     
     .amount {
-        font-size: 1.6rem;
-        line-height: 1.1;
-        padding: 0 5px;
+        font-size: 1.5rem;
+        line-height: 1;
+        padding: 0;
+        white-space: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        text-overflow: ellipsis;
+        max-width: calc(100% - 40px); /* Ruang untuk "Rp" */
     }
     
     .amount.error,
     .amount.empty {
         font-size: 0.9rem;
+        white-space: normal;
     }
     
     .time-card-3d {
@@ -746,39 +775,59 @@ h1 {
         padding: 0 5px;
     }
     
+    /* ==================== PERBAIKAN 2 & 3 UNTUK MOBILE ==================== */
     .stats {
-        flex-direction: column;
-        gap: 12px;
-        padding: 12px;
+        flex-direction: row; /* Tetap horizontal di mobile */
+        gap: 5px;
+        padding: 10px;
         margin-bottom: 12px;
         border-radius: 12px;
+        justify-content: space-between; /* Sebar merata */
+        flex-wrap: nowrap;
+        overflow-x: auto; /* Scroll jika terlalu kecil */
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
     }
     
     .stat-item {
-        justify-content: center;
+        flex-direction: row; /* Horizontal */
+        gap: 5px;
         min-width: auto;
-        width: 100%;
-        gap: 10px;
+        justify-content: flex-start;
+        flex: 1; /* Sama rata */
+        padding: 0 3px;
     }
     
     .stat-icon {
-        width: 30px;
-        height: 30px;
+        width: 28px;
+        height: 28px;
         font-size: 0.8rem;
+        flex-shrink: 0;
+    }
+    
+    .stat-info {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+        white-space: nowrap;
+        overflow: hidden;
     }
     
     .stat-value {
-        font-size: 1rem;
+        font-size: 0.95rem;
+        line-height: 1.1;
     }
     
     .stat-label {
-        font-size: 0.75rem;
+        font-size: 0.7rem;
+        line-height: 1;
+        margin-top: 1px;
     }
     
     .stat-divider {
-        width: 100%;
-        height: 1px;
-        margin: 3px 0;
+        width: 1px;
+        height: 25px;
+        margin: 0 3px;
     }
     
     .footer-3d {
@@ -866,6 +915,10 @@ h1 {
     .amount {
         font-size: 2rem;
     }
+    
+    .stats {
+        padding: 12px;
+    }
 }
 
 /* Untuk tablet landscape */
@@ -882,6 +935,10 @@ h1 {
     
     .amount {
         font-size: 2.2rem;
+    }
+    
+    .stats {
+        padding: 15px;
     }
 }
 
@@ -911,14 +968,14 @@ h1 {
     
     .stats {
         flex-direction: row;
-        gap: 10px;
-        padding: 10px;
+        gap: 8px;
+        padding: 8px;
     }
     
     .stat-divider {
         width: 1px;
-        height: 30px;
-        margin: 0 5px;
+        height: 25px;
+        margin: 0 4px;
     }
     
     .saldo-display {
@@ -940,25 +997,43 @@ h1 {
         font-size: 1.1rem;
     }
     
+    /* Perbaikan untuk layar sangat kecil */
+    .saldo-display {
+        gap: 2px;
+    }
+    
+    .currency {
+        font-size: 1.2rem;
+    }
+    
     .amount {
-        font-size: 1.4rem;
+        font-size: 1.3rem;
     }
     
     .time-display {
         font-size: 0.75rem;
     }
     
+    .stats {
+        gap: 3px;
+        padding: 8px;
+    }
+    
     .stat-item {
-        gap: 6px;
+        gap: 3px;
     }
     
     .stat-icon {
-        width: 25px;
-        height: 25px;
+        width: 24px;
+        height: 24px;
         font-size: 0.7rem;
     }
     
     .stat-value {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
+    }
+    
+    .stat-label {
+        font-size: 0.65rem;
     }
 }
