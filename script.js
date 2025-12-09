@@ -67,7 +67,7 @@ async function fetchSaldo() {
             showError('Database tidak dapat diakses');
         } else {
             updateConnectionStatus('error');
-            showError('Offline • Coba lagi nanti');
+            showError('Offline • Menyambungkan');
         }
         
         // Retry logic
