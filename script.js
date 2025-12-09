@@ -67,7 +67,7 @@ async function fetchSaldo() {
             showError('Database tidak dapat diakses');
         } else {
             updateConnectionStatus('offline');
-            showError('Offline • Menyambungkan');
+            showError('Offline • Menyambungkan...');
         }
         
         // Retry logic
@@ -200,7 +200,7 @@ function updateConnectionStatus(status) {
             
         case 'connecting':
             signalText.textContent = 'Menghubungkan...';
-            statusElement.innerHTML = '<i class="fas fa-circle" style="color:#f59e0b"></i> <span>Menyambungkan ke server...</span>';
+            statusElement.innerHTML = '<i class="fas fa-circle" style="color:#f59e0b"></i> <span>Menyambungkan...</span>';
             break;
             
         case 'timeout':
