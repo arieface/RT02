@@ -1,1737 +1,452 @@
-/* ==================== VARIABEL CSS UNTUK THEME ==================== */
-:root {
-    /* Default theme (purple) */
-    --primary-color: #667eea;
-    --secondary-color: #764ba2;
-    --accent-color: #a5b4fc;
-    --danger-color: #ef4444;
-    --warning-color: #f59e0b;
-    --success-color: #10b981;
-    --background-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --card-gradient: linear-gradient(135deg, #f8fafc, #f1f5f9);
-    --stat-icon-gradient: linear-gradient(135deg, #667eea, #764ba2);
-    --text-color: #1e293b;
-    --text-secondary: #64748b;
-    --card-border: rgba(226, 232, 240, 0.8);
-    --transition-speed: 0.5s;
-    --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Red Theme - STRAWBERRY DARK RED (Saldo < 500.000) */
-[data-theme="red"] {
-    --primary-color: #dc2626;
-    --secondary-color: #e11d48; /* Warna lebih terang untuk icon */
-    --accent-color: #fca5a5;
-    --background-gradient: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-    --stat-icon-gradient: linear-gradient(135deg, #dc2626, #e11d48); /* Gradient lebih terang */
-    --danger-color: #b91c1c;
-    --warning-color: #ea580c;
-}
-
-/* Yellow-Orange Theme (Saldo 500.000 - 1.000.000) */
-[data-theme="yellow-orange"] {
-    --primary-color: #f59e0b;
-    --secondary-color: #ea580c;
-    --accent-color: #fdba74;
-    --background-gradient: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
-    --stat-icon-gradient: linear-gradient(135deg, #f59e0b, #ea580c);
-    --warning-color: #ea580c;
-}
-
-/* Teal Theme (Saldo > 1.000.000) */
-[data-theme="teal"] {
-    --primary-color: #0d9488;
-    --secondary-color: #0f766e;
-    --accent-color: #5eead4;
-    --background-gradient: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
-    --stat-icon-gradient: linear-gradient(135deg, #0d9488, #0f766e);
-    --success-color: #0f766e;
-}
-
-/* ==================== TRANSISI GLOBAL ==================== */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    transition: background-color var(--transition-speed) var(--transition-timing),
-                color var(--transition-speed) var(--transition-timing),
-                border-color var(--transition-speed) var(--transition-timing),
-                box-shadow var(--transition-speed) var(--transition-timing),
-                background-image var(--transition-speed) var(--transition-timing);
-}
-
-body {
-    font-family: 'Poppins', sans-serif;
-    background: var(--background-gradient);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    overflow-x: hidden;
-    padding: 20px;
-    transition: background var(--transition-speed) var(--transition-timing);
-}
-
-.background-3d {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    perspective: 1000px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-}
-
-.floating-shapes {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: -1;
-}
-
-.shape {
-    position: absolute;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(5px);
-    animation: float 15s infinite ease-in-out;
-    pointer-events: none;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 
-        inset 0 0 20px rgba(255, 255, 255, 0.1),
-        0 0 40px rgba(255, 255, 255, 0.1);
-}
-
-.shape-1 {
-    width: 250px;
-    height: 250px;
-    top: 15%;
-    left: 10%;
-    animation-delay: 0s;
-}
-
-.shape-2 {
-    width: 180px;
-    height: 180px;
-    bottom: 20%;
-    right: 12%;
-    animation-delay: 5s;
-}
-
-.shape-3 {
-    width: 120px;
-    height: 120px;
-    top: 65%;
-    left: 85%;
-    animation-delay: 10s;
-}
-
-@keyframes float {
-    0%, 100% {
-        transform: translateY(0) rotate(0deg);
-    }
-    50% {
-        transform: translateY(-20px) rotate(180deg);
-    }
-}
-
-/* Container utama untuk centering */
-.app-container {
-    width: 100%;
-    max-width: 500px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-    margin: 0 auto;
-    z-index: 1;
-}
-
-.card-3d {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: 24px;
-    padding: 20px;
-    box-shadow: 
-        0 20px 40px rgba(0, 0, 0, 0.15),
-        0 15px 30px rgba(0, 0, 0, 0.12),
-        inset 0 1px 0 rgba(255, 255, 255, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    transform-style: preserve-3d;
-    animation: cardEntrance 0.8s ease-out;
-    position: relative;
-    overflow: hidden;
-    width: 100%;
-    max-width: 100%;
-    z-index: 2;
-}
-
-.card-3d::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-    border-radius: 24px 24px 0 0;
-    transition: background var(--transition-speed) var(--transition-timing);
-}
-
-@keyframes cardEntrance {
-    from {
-        opacity: 0;
-        transform: translateY(50px) rotateX(10deg);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) rotateX(0);
-    }
-}
-
-/* Header */
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    justify-content: flex-start;
-    flex: 1;
-}
-
-.logo i {
-    font-size: 2rem;
-    color: var(--primary-color);
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 2px 4px rgba(var(--primary-color-rgb), 0.3));
-}
-
-h1 {
-    color: #2d3748;
-    font-size: 1.5rem;
-    font-weight: 700;
-    letter-spacing: -0.3px;
-    text-align: left;
-}
-
-/* Connection signal */
-.connection-signal {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 12px;
-    border-radius: 16px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-    color: #475569;
-    border: 1px solid rgba(226, 232, 240, 0.8);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    margin-left: 10px;
-}
-
-.signal-bars {
-    display: flex;
-    align-items: flex-end;
-    gap: 2px;
-    height: 14px;
-}
-
-.signal-bar {
-    width: 3px;
-    background: var(--success-color);
-    border-radius: 1px;
-    animation: signalPulse 2s infinite ease-in-out;
-}
-
-.signal-bar:nth-child(1) { height: 4px; animation-delay: 0s; }
-.signal-bar:nth-child(2) { height: 7px; animation-delay: 0.2s; }
-.signal-bar:nth-child(3) { height: 10px; animation-delay: 0.4s; }
-.signal-bar:nth-child(4) { height: 13px; animation-delay: 0.6s; }
-
-@keyframes signalPulse {
-    0%, 100% { opacity: 0.5; }
-    50% { opacity: 1; }
-}
-
-.connection-signal.offline .signal-bar {
-    background: var(--danger-color);
-}
-
-/* Info card */
-.info-card-3d {
-    background: var(--card-gradient);
-    border-radius: 18px;
-    padding: 18px;
-    margin-bottom: 15px;
-    border: 1px solid var(--card-border);
-    box-shadow: 
-        0 10px 25px rgba(0, 0, 0, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.8);
-    transform-style: preserve-3d;
-    position: relative;
-    overflow: hidden;
-}
-
-.info-card-3d::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-    transform: translateX(-100%);
-}
-
-.info-card-3d:hover::after {
-    animation: shine 1.5s;
-}
-
-@keyframes shine {
-    100% {
-        transform: translateX(100%);
-    }
-}
-
-.card-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 12px;
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-    font-weight: 600;
-}
-
-.card-label i {
-    color: var(--primary-color);
-    font-size: 1rem;
-}
-
-/* Saldo display - EFEK KILAU YANG DIOPTIMALKAN */
-.saldo-display {
-    display: flex;
-    align-items: baseline;
-    justify-content: center;
-    gap: 8px;
-    margin-bottom: 12px;
-    min-height: 50px;
-    flex-wrap: nowrap;
-    white-space: nowrap;
-    position: relative;
-}
-
-.currency {
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--primary-color);
-    text-shadow: 0 2px 4px rgba(var(--primary-color-rgb), 0.2);
-    line-height: 1;
-}
-
-/* EFEK KILAU YANG DIOPTIMALKAN - NO LAG */
-.amount {
-    font-size: 2rem;
-    font-weight: 800;
-    color: var(--text-color);
-    letter-spacing: -0.5px;
-    word-break: keep-all;
-    overflow: hidden;
-    text-align: center;
-    line-height: 1;
-    white-space: nowrap;
-    max-width: 100%;
-    overflow-x: auto;
-    overflow-y: hidden;
-    position: relative;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Efek kilau dengan pseudo-element untuk performance yang lebih baik */
-.amount::before {
-    content: attr(data-text);
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(
-        90deg,
-        transparent 0%,
-        var(--accent-color) 20%,
-        var(--accent-color) 30%,
-        transparent 40%
-    );
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-size: 200% 100%;
-    animation: shimmer-optimized 3s infinite linear;
-    z-index: 1;
-    pointer-events: none;
-}
-
-.amount::after {
-    content: attr(data-text);
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    color: var(--text-color);
-    z-index: 0;
-}
-
-/* Animasi kilau yang lebih smooth untuk mencegah lag */
-@keyframes shimmer-optimized {
-    0% {
-        background-position: -200% 0;
-        opacity: 0.8;
-    }
-    50% {
-        background-position: 200% 0;
-        opacity: 1;
-    }
-    100% {
-        background-position: -200% 0;
-        opacity: 0.8;
-    }
-}
-
-/* Alternatif: Efek kilau sederhana untuk device yang lebih lemah */
-.amount.simple-shimmer {
-    position: relative;
-    overflow: hidden;
-}
-
-.amount.simple-shimmer::after {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -60%;
-    width: 20%;
-    height: 200%;
-    background: linear-gradient(
-        to right,
-        transparent 0%,
-        rgba(255, 255, 255, 0.4) 50%,
-        transparent 100%
-    );
-    transform: rotate(30deg);
-    animation: simple-shimmer 2.5s infinite;
-}
-
-@keyframes simple-shimmer {
-    0% {
-        left: -60%;
-    }
-    100% {
-        left: 140%;
-    }
-}
-
-/* Error & empty state */
-.amount.error {
-    font-size: 1.1rem;
-    color: var(--warning-color);
-    background: none;
-    -webkit-text-fill-color: var(--warning-color);
-    font-weight: 600;
-    animation: shake 0.5s ease;
-    white-space: normal;
-}
-
-.amount.empty {
-    font-size: 1.1rem;
-    color: var(--warning-color);
-    background: none;
-    -webkit-text-fill-color: var(--warning-color);
-    font-weight: 600;
-    white-space: normal;
-}
-
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-    20%, 40%, 60%, 80% { transform: translateX(5px); }
-}
-
-/* Time card */
-.time-card-3d {
-    background: linear-gradient(145deg, #f0f0f0, #e0e0e0);
-    color: #1f2937;
-    border-radius: 16px;
-    padding: 15px;
-    margin-bottom: 15px;
-    box-shadow: 
-        0 12px 30px rgba(0, 0, 0, 0.15),
-        inset 0 1px 0 rgba(255, 255, 255, 0.8),
-        inset 0 -1px 1px rgba(0, 0, 0, 0.1),
-        0 0 0 1px rgba(220, 220, 220, 0.8);
-    border: 1px solid rgba(200, 200, 200, 0.6);
-    position: relative;
-    overflow: hidden;
-}
-
-.time-card-3d::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, 
-        #c0c0c0, 
-        #f0f0f0, 
-        #ffffff,
-        #f0f0f0,
-        #c0c0c0);
-    border-radius: 16px 16px 0 0;
-    opacity: 0.9;
-    box-shadow: 
-        0 2px 15px rgba(192, 192, 192, 0.5),
-        0 0 25px rgba(255, 255, 255, 0.4);
-}
-
-.time-card-3d::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(
-        45deg,
-        transparent 30%,
-        rgba(255, 255, 255, 0.4) 50%,
-        transparent 70%
-    );
-    pointer-events: none;
-    opacity: 0.3;
-    animation: shine 3s infinite linear;
-}
-
-.time-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
-    color: #4b5563;
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
-}
-
-.time-label i {
-    color: #6b7280;
-    font-size: 0.9rem;
-    text-shadow: 
-        0 1px 3px rgba(255, 255, 255, 0.8),
-        0 0 10px rgba(255, 255, 255, 0.5);
-}
-
-.time-display {
-    font-size: 1rem;
-    font-weight: 600;
-    text-align: center;
-    color: #111827;
-    letter-spacing: 0.5px;
-    font-variant-numeric: tabular-nums;
-    min-height: 25px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1.3;
-    text-shadow: 
-        0 1px 3px rgba(255, 255, 255, 0.8),
-        0 0 15px rgba(255, 255, 255, 0.4);
-}
-
-/* Stats */
-.stats {
-    display: flex;
-    justify-content: space-around;
-    background: rgba(241, 245, 249, 0.8);
-    border-radius: 14px;
-    padding: 15px;
-    margin-bottom: 15px;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(226, 232, 240, 0.5);
-    flex-wrap: nowrap;
-}
-
-.stat-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    min-width: auto;
-    justify-content: center;
-    flex-direction: row;
-}
-
-.stat-icon {
-    width: 35px;
-    height: 35px;
-    background: var(--stat-icon-gradient);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 0.9rem;
-    box-shadow: 0 4px 8px rgba(var(--primary-color-rgb), 0.3);
-    flex-shrink: 0;
-}
-
-.stat-info {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    text-align: left;
-    white-space: nowrap;
-}
-
-.stat-value {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--text-color);
-    line-height: 1.2;
-}
-
-.stat-label {
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    font-weight: 500;
-    margin-top: 2px;
-    line-height: 1.1;
-}
-
-.stat-divider {
-    width: 1px;
-    height: 35px;
-    background: rgba(203, 213, 224, 0.5);
-    margin: 0 5px;
-    align-self: center;
-}
-
-/* Footer */
-.footer-3d {
-    text-align: center;
-    color: var(--text-secondary);
-    font-size: 0.85rem;
-    width: 100%;
-}
-
-.footer-3d p {
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    font-size: 0.8rem;
-}
-
-.footer-3d p i {
-    font-size: 0.9rem;
-    vertical-align: middle;
-    line-height: 1;
-}
-
-.watermark {
-    text-align: center;
-    margin-top: 20px;
-    color: rgba(255, 255, 255, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    z-index: 2;
-}
-
-/* Loading dots (text) */
-.loading-dots {
-    display: inline-flex;
-    gap: 3px;
-}
-
-.loading-dots span {
-    animation: dotPulse 1.5s infinite ease-in-out;
-    opacity: 0;
-    font-size: 1rem;
-}
-
-.loading-dots span:nth-child(1) { animation-delay: 0s; }
-.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
-.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
-
-@keyframes dotPulse {
-    0%, 100% { opacity: 0; }
-    50% { opacity: 1; }
-}
-
-/* Connection status */
-.connection-status {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    margin-top: 10px;
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-    opacity: 0.8;
-    text-align: center;
-    line-height: 1.2;
-}
-
-.connection-status i {
-    font-size: 0.65rem;
-    line-height: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    vertical-align: middle;
-    position: relative;
-    top: 0;
-}
-
-.connection-status span {
-    line-height: 1.2;
-    display: inline-flex;
-    align-items: center;
-    vertical-align: middle;
-}
-
-.connection-status.online i {
-    color: var(--success-color);
-}
-
-.connection-status.offline i {
-    color: var(--danger-color);
-    animation: blink 1s infinite;
-}
-
-@keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-}
-
-/* Loading dots (circle) */
-.loading-dots-container {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    height: 35px;
-}
-
-.loading-dots-container span {
-    display: inline-block;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--primary-color);
-    animation: dotBounce 1.4s infinite ease-in-out both;
-}
-
-.loading-dots-container span:nth-child(1) { 
-    animation-delay: -0.32s; 
-}
-.loading-dots-container span:nth-child(2) { 
-    animation-delay: -0.16s; 
-}
-.loading-dots-container span:nth-child(3) { 
-    animation-delay: 0s; 
-}
-
-@keyframes dotBounce {
-    0%, 80%, 100% { 
-        transform: scale(0);
-        opacity: 0.5;
-    }
-    40% { 
-        transform: scale(1);
-        opacity: 1;
-    }
-}
-
-/* ==================== RESPONSIVE DESIGN ==================== */
-
-/* ==================== MOBILE VIEW (Phone) ==================== */
-@media (max-width: 480px) {
-    body {
-        padding: 10px;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        display: flex;
-        overflow-y: auto;
-        overflow-x: hidden;
+// ==================== KONFIGURASI ====================
+// GANTI DENGAN LINK PUBLIKASI GOOGLE SHEETS ANDA
+const DATABASE_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbLFk69seIMkTsx5xGSLyOHM4Iou1uTQMNNpTnwSoWX5Yu2JBgs71Lbd9OH2Xdgq6GKR0_OiTo9shV/pub?gid=236846195&range=A100:A100&single=true&output=csv";
+
+// ==================== VARIABEL GLOBAL ====================
+let isRefreshing = false;
+let retryCount = 0;
+const MAX_RETRIES = 3;
+let lastSuccessfulFetch = null;
+let isOnline = navigator.onLine;
+let currentTheme = 'default';
+let lastSaldo = 0;
+
+// ==================== FUNGSI UBAH THEME ====================
+function updateThemeBasedOnSaldo(saldo) {
+    let newTheme = 'default';
+    
+    if (saldo < 500000) {
+        newTheme = 'red';
+    } else if (saldo >= 500000 && saldo < 1000000) {
+        newTheme = 'yellow-orange';
+    } else if (saldo >= 1000000) {
+        newTheme = 'teal';
     }
     
-    .background-3d {
-        justify-content: center;
-        align-items: center;
-        display: flex;
-        flex-direction: column;
-        padding: 10px;
-        position: fixed;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
+    // Hanya ubah theme jika berbeda
+    if (newTheme !== currentTheme) {
+        currentTheme = newTheme;
+        document.body.setAttribute('data-theme', currentTheme);
+        console.log(`🎨 Theme berubah ke: ${currentTheme} (Saldo: ${saldo})`);
     }
+}
+
+// ==================== FUNGSI UTAMA ====================
+async function fetchSaldo() {
+    if (isRefreshing) return;
     
-    /* Bubble animasi yang jelas terlihat di phone view */
-    .floating-shapes {
-        display: block !important;
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: 0;
-    }
+    isRefreshing = true;
+    updateConnectionStatus('connecting');
     
-    /* Bubble lebih besar dan jelas terlihat dengan posisi Y yang keluar card */
-    .shape {
-        opacity: 0.4;
-        backdrop-filter: blur(3px);
-        filter: brightness(1.3) contrast(1.2);
-        border: 2px solid rgba(255, 255, 255, 0.5);
-        box-shadow: 
-            inset 0 0 50px rgba(255, 255, 255, 0.4),
-            0 0 100px rgba(255, 255, 255, 0.3),
-            0 0 150px rgba(255, 255, 255, 0.2);
-        animation: float-mobile 25s infinite ease-in-out;
-        z-index: 0;
-    }
-    
-    /* BUBBLE 1 - Kiri atas, keluar dari card di bagian atas */
-    .shape-1 {
-        width: 200px;
-        height: 200px;
-        top: -50px !important;
-        left: -40px !important;
-        animation-delay: 0s;
-        animation-duration: 30s;
-        background: radial-gradient(circle at 30% 30%, 
-            rgba(255, 255, 255, 0.35), 
-            rgba(255, 255, 255, 0.15) 70%);
-    }
-    
-    /* BUBBLE 2 - Kanan bawah, keluar dari card di bagian bawah */
-    .shape-2 {
-        width: 160px;
-        height: 160px;
-        bottom: -40px !important;
-        right: -30px !important;
-        animation-delay: 8s;
-        animation-duration: 35s;
-        background: radial-gradient(circle at 70% 70%, 
-            rgba(255, 255, 255, 0.35), 
-            rgba(255, 255, 255, 0.15) 70%);
-    }
-    
-    /* BUBBLE 3 - Tengah kanan, jelas terlihat di luar card */
-    .shape-3 {
-        width: 120px;
-        height: 120px;
-        top: 40% !important;
-        left: 90% !important;
-        animation-delay: 16s;
-        animation-duration: 40s;
-        background: radial-gradient(circle at 50% 50%, 
-            rgba(255, 255, 255, 0.4), 
-            rgba(255, 255, 255, 0.2) 70%);
-    }
-    
-    /* Animasi khusus untuk mobile dengan lebih banyak gerakan Y axis */
-    @keyframes float-mobile {
-        0%, 100% {
-            transform: translateY(0) rotate(0deg) scale(1);
+    try {
+        console.log("📡 Mengambil data dari server...");
+        
+        // Update UI ke loading state
+        showLoadingState();
+        
+        // Fetch data dengan timeout
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 10000);
+        
+        const timestamp = new Date().getTime();
+        const response = await fetch(`${DATABASE_URL}&_=${timestamp}`, {
+            signal: controller.signal,
+            cache: 'no-store',
+            headers: {
+                'Cache-Control': 'no-cache'
+            }
+        });
+        
+        clearTimeout(timeout);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
         }
-        20% {
-            transform: translateY(-25px) rotate(72deg) scale(1.08);
+        
+        const text = await response.text();
+        console.log("✅ Data diterima:", text);
+        
+        // Process data
+        const processedData = processSaldoData(text);
+        
+        // Update saldo dan theme
+        updateSaldoDisplay(processedData);
+        updateThemeBasedOnSaldo(processedData.numeric);
+        lastSaldo = processedData.numeric;
+        
+        updateConnectionStatus('online');
+        retryCount = 0;
+        lastSuccessfulFetch = new Date();
+        
+    } catch (error) {
+        console.error("❌ Error:", error);
+        
+        if (error.name === 'AbortError') {
+            updateConnectionStatus('timeout');
+            showError('Coba lagi - server lambat');
+        } else if (!navigator.onLine) {
+            updateConnectionStatus('offline');
+            showError('Offline - cek koneksi');
+        } else if (error.message.includes('HTTP')) {
+            updateConnectionStatus('error');
+            showError('Database tidak dapat diakses');
+        } else {
+            updateConnectionStatus('offline');
+            showError('Offline • Menyambungkan...');
         }
-        40% {
-            transform: translateY(15px) rotate(144deg) scale(0.95);
+        
+        // Retry logic
+        if (retryCount < MAX_RETRIES) {
+            retryCount++;
+            console.log(`🔄 Retry ${retryCount}/${MAX_RETRIES} dalam 3 detik...`);
+            setTimeout(fetchSaldo, 3000);
         }
-        60% {
-            transform: translateY(-15px) rotate(216deg) scale(1.05);
+        
+    } finally {
+        setTimeout(() => {
+            isRefreshing = false;
+        }, 1000);
+    }
+}
+
+// ==================== FUNGSI PEMROSESAN DATA ====================
+function processSaldoData(rawData) {
+    console.log("🔧 Memproses data:", rawData);
+    
+    // Trim dan bersihkan data
+    let cleaned = rawData.trim();
+    
+    // Cek jika data kosong
+    if (!cleaned) {
+        throw new Error('Data kosong');
+    }
+    
+    // Coba berbagai format angka
+    let numericValue;
+    
+    // Format 1: Rp 1.234.567 atau 1.234.567
+    if (cleaned.includes('.')) {
+        // Hapus Rp jika ada
+        cleaned = cleaned.replace(/Rp\s*/i, '');
+        // Hapus semua titik (pemisah ribuan)
+        cleaned = cleaned.replace(/\./g, '');
+        // Ganti koma dengan titik untuk desimal
+        cleaned = cleaned.replace(',', '.');
+    }
+    // Format 2: 1,234,567 (format internasional)
+    else if (cleaned.includes(',')) {
+        // Hapus semua koma
+        cleaned = cleaned.replace(/,/g, '');
+    }
+    
+    // Cek jika ada karakter non-numerik selain minus dan titik
+    if (!/^-?\d*\.?\d*$/.test(cleaned)) {
+        throw new Error('Format data tidak valid');
+    }
+    
+    // Konversi ke number
+    numericValue = parseFloat(cleaned);
+    
+    if (isNaN(numericValue)) {
+        throw new Error('Tidak dapat mengkonversi ke angka');
+    }
+    
+    // Format ke Rupiah
+    const formatted = new Intl.NumberFormat('id-ID', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(numericValue);
+    
+    return {
+        raw: rawData,
+        numeric: numericValue,
+        formatted: formatted
+    };
+}
+
+// ==================== FUNGSI UI ====================
+function updateSaldoDisplay(data) {
+    const saldoElement = document.getElementById('saldo');
+    if (!saldoElement) return;
+    
+    // Hapus semua class
+    saldoElement.className = 'amount';
+    
+    // Update teks
+    saldoElement.textContent = data.formatted;
+    
+    // Efek update halus dengan transisi
+    saldoElement.style.transition = 'all 0.5s ease';
+    saldoElement.style.transform = 'scale(1.05)';
+    saldoElement.style.opacity = '0.8';
+    
+    setTimeout(() => {
+        saldoElement.style.transform = 'scale(1)';
+        saldoElement.style.opacity = '1';
+    }, 300);
+    
+    // Update waktu
+    updateTime();
+}
+
+function showLoadingState() {
+    const saldoElement = document.getElementById('saldo');
+    const statusElement = document.getElementById('connection-status');
+    
+    if (saldoElement) {
+        saldoElement.innerHTML = `
+            <div class="loading-dots-container">
+                <span></span><span></span><span></span>
+            </div>
+        `;
+        saldoElement.className = 'amount';
+    }
+    
+    if (statusElement) {
+        statusElement.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> <span>Mengambil data terbaru...</span>';
+    }
+}
+
+function updateConnectionStatus(status) {
+    const signalElement = document.getElementById('connection-signal');
+    const signalText = document.getElementById('signal-text');
+    const statusElement = document.getElementById('connection-status');
+    
+    if (!signalElement || !signalText || !statusElement) return;
+    
+    // Reset class
+    signalElement.className = 'connection-signal';
+    statusElement.className = 'connection-status';
+    
+    switch(status) {
+        case 'online':
+            signalElement.classList.add('online');
+            signalText.textContent = 'Online';
+            statusElement.innerHTML = '<i class="fas fa-circle" style="color:#10b981"></i> <span>Terhubung • Data real-time</span>';
+            statusElement.classList.add('online');
+            break;
+            
+        case 'connecting':
+            signalText.textContent = 'Menghubungkan...';
+            statusElement.innerHTML = '<i class="fas fa-circle" style="color:#f59e0b"></i> <span>Menyambungkan...</span>';
+            break;
+            
+        case 'timeout':
+            signalElement.classList.add('offline');
+            signalText.textContent = 'Timeout';
+            statusElement.innerHTML = '<i class="fas fa-circle" style="color:#f59e0b"></i> <span>Server lambat • Mencoba lagi...</span>';
+            statusElement.classList.add('offline');
+            break;
+            
+        case 'offline':
+            signalElement.classList.add('offline');
+            signalText.textContent = 'Offline';
+            statusElement.innerHTML = '<i class="fas fa-circle" style="color:#ef4444"></i> <span>Server offline</span>';
+            statusElement.classList.add('offline');
+            break;
+            
+        case 'error':
+            signalElement.classList.add('offline');
+            signalText.textContent = 'Error';
+            statusElement.innerHTML = '<i class="fas fa-circle" style="color:#ef4444"></i> <span>Offline • Menyambungkan...</span>';
+            statusElement.classList.add('offline');
+            break;
+    }
+}
+
+function showError(message) {
+    const saldoElement = document.getElementById('saldo');
+    if (!saldoElement) return;
+    
+    // Ganti "Gagal" dengan "Coba" dan "Error" dengan "Offline"
+    let displayMessage = message;
+    
+    if (message.includes('Gagal')) {
+        displayMessage = message.replace('Gagal', 'Coba');
+    }
+    if (message.includes('Error')) {
+        displayMessage = message.replace('Error', 'Offline');
+    }
+    if (message.includes('gagal')) {
+        displayMessage = message.replace('gagal', 'coba');
+    }
+    if (message.includes('error')) {
+        displayMessage = message.replace('error', 'offline');
+    }
+    
+    saldoElement.textContent = displayMessage;
+    saldoElement.className = 'amount error';
+}
+
+// ==================== FUNGSI UPDATE TIME ====================
+function updateTime() {
+    const now = new Date();
+    const gmt7Time = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Jakarta"}));
+
+    // Format hari
+    const hari = gmt7Time.getDate();
+    const bulanIndex = gmt7Time.getMonth();
+    const tahun = gmt7Time.getFullYear();
+    
+    // Format waktu
+    const jam = String(gmt7Time.getHours()).padStart(2, '0');
+    const menit = String(gmt7Time.getMinutes()).padStart(2, '0');
+    const detik = String(gmt7Time.getSeconds()).padStart(2, '0');
+    
+    // Nama hari dalam bahasa Indonesia
+    const namaHari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+    const namaHariSekarang = namaHari[gmt7Time.getDay()];
+    
+    // Nama bulan dalam bahasa Indonesia
+    const namaBulan = [
+        "Januari", "Februari", "Maret", "April", 
+        "Mei", "Juni", "Juli", "Agustus", 
+        "September", "Oktober", "November", "Desember"
+    ];
+    const namaBulanSekarang = namaBulan[bulanIndex];
+    
+    // Format: Selasa, 10 Desember 2024 ~ 14:30:45 WIB
+    const timeString = `${namaHariSekarang}, ${hari} ${namaBulanSekarang} ${tahun} • ${jam}:${menit}:${detik} WIB`;
+    
+    const waktuElement = document.getElementById('waktu');
+    if (waktuElement) {
+        waktuElement.textContent = timeString;
+    }
+}
+
+// ==================== FUNGSI DETEKSI KONEKSI ====================
+function checkConnection() {
+    isOnline = navigator.onLine;
+    
+    if (isOnline) {
+        updateConnectionStatus('online');
+        // Jika baru online, fetch data
+        if (!lastSuccessfulFetch || (Date.now() - lastSuccessfulFetch) > 300000) {
+            fetchSaldo();
         }
-        80% {
-            transform: translateY(20px) rotate(288deg) scale(0.98);
+    } else {
+        updateConnectionStatus('offline');
+        showError('Offline - cek koneksi server');
+    }
+}
+
+// ==================== INISIALISASI ====================
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("🚀 Aplikasi Kas RT02-RW18 dimulai...");
+    
+    // Set theme default
+    document.body.setAttribute('data-theme', 'default');
+    
+    // Update stat "24 Jam Online"
+    updateStatsDisplay();
+    
+    // Cek koneksi awal
+    checkConnection();
+    
+    // Setup event listeners untuk koneksi
+    window.addEventListener('online', checkConnection);
+    window.addEventListener('offline', checkConnection);
+    
+    // Fetch data pertama
+    setTimeout(fetchSaldo, 500);
+    
+    // Update waktu setiap detik
+    updateTime();
+    setInterval(updateTime, 1000);
+    
+    // Auto-refresh setiap 5 menit
+    setInterval(() => {
+        if (isOnline) {
+            fetchSaldo();
+        }
+    }, 300000);
+    
+    // Cek koneksi secara berkala
+    setInterval(checkConnection, 30000);
+});
+
+// ==================== FUNGSI TAMBAHAN ====================
+function updateStatsDisplay() {
+    const statItems = document.querySelectorAll('.stat-item');
+    if (statItems.length >= 2) {
+        const timeStat = statItems[1];
+        const statValue = timeStat.querySelector('.stat-value');
+        const statLabel = timeStat.querySelector('.stat-label');
+        
+        if (statValue && statLabel) {
+            statValue.textContent = '24 Jam';
+            statLabel.textContent = 'Akses';
         }
     }
-    
-    /* Efek pulsasi dengan pergerakan Y yang lebih jelas */
-    @keyframes pulse-mobile {
-        0%, 100% {
-            opacity: 0.4;
-            transform: translateY(0);
-            box-shadow: 
-                inset 0 0 50px rgba(255, 255, 255, 0.4),
-                0 0 100px rgba(255, 255, 255, 0.3),
-                0 0 150px rgba(255, 255, 255, 0.2);
-        }
-        50% {
-            opacity: 0.5;
-            transform: translateY(-10px);
-            box-shadow: 
-                inset 0 0 60px rgba(255, 255, 255, 0.5),
-                0 0 120px rgba(255, 255, 255, 0.4),
-                0 0 180px rgba(255, 255, 255, 0.3);
-        }
-    }
-    
-    .shape {
-        animation: 
-            float-mobile 25s infinite ease-in-out,
-            pulse-mobile 10s infinite ease-in-out;
-    }
-    
-    /* Pastikan card memiliki background semi-transparan agar bubble terlihat */
-    .app-container {
-        margin: 0;
-        width: 100%;
-        max-width: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-        padding: 0;
-        z-index: 1;
-        position: relative;
-    }
-    
-    .card-3d {
-        padding: 15px;
-        margin: 0;
-        width: 100%;
-        max-width: 100%;
-        min-height: auto;
-        box-sizing: border-box;
-        border-radius: 20px;
-        background: rgba(255, 255, 255, 0.85);
-        backdrop-filter: blur(15px) saturate(180%);
-        z-index: 2;
-        position: relative;
-        border: 1px solid rgba(255, 255, 255, 0.5);
-        box-shadow: 
-            0 20px 40px rgba(0, 0, 0, 0.12),
-            0 8px 20px rgba(0, 0, 0, 0.08),
-            inset 0 1px 0 rgba(255, 255, 255, 0.9);
-        margin-top: 30px;
-        margin-bottom: 30px;
-    }
-    
-    /* Tambahkan efek border glowing pada card */
-    .card-3d::after {
-        content: '';
-        position: absolute;
-        top: -2px;
-        left: -2px;
-        right: -2px;
-        bottom: -2px;
-        background: linear-gradient(
-            45deg,
-            transparent,
-            rgba(255, 255, 255, 0.4),
-            transparent
-        );
-        border-radius: 22px;
-        z-index: -1;
-        opacity: 0.7;
-        animation: border-glow 4s infinite linear;
-    }
-    
-    @keyframes border-glow {
-        0%, 100% {
-            opacity: 0.5;
-        }
-        50% {
-            opacity: 0.8;
-        }
-    }
-    
-    /* Overlay untuk meningkatkan visibilitas bubble di belakang card */
-    .background-3d::before {
-        content: '';
-        position: absolute;
-        top: -50px;
-        left: -50px;
-        right: -50px;
-        bottom: -50px;
-        background: 
-            radial-gradient(
-                circle at 15% -10%,
-                rgba(255, 255, 255, 0.2) 0%,
-                transparent 60%
-            ),
-            radial-gradient(
-                circle at 85% 110%,
-                rgba(255, 255, 255, 0.18) 0%,
-                transparent 60%
-            ),
-            radial-gradient(
-                circle at 95% 40%,
-                rgba(255, 255, 255, 0.15) 0%,
-                transparent 50%
-            );
-        pointer-events: none;
-        z-index: -1;
-    }
-    
-    /* Efek highlight di sekitar card untuk bubble yang keluar */
-    .card-3d::before {
-        content: '';
-        position: absolute;
-        top: -50px;
-        left: -50px;
-        right: -50px;
-        bottom: -50px;
-        background: 
-            radial-gradient(
-                circle at -30px -50px,
-                rgba(var(--primary-color-rgb, 102, 126, 234), 0.15) 0%,
-                transparent 150px
-            ),
-            radial-gradient(
-                circle at calc(100% + 40px) calc(100% + 50px),
-                rgba(var(--secondary-color-rgb, 118, 75, 162), 0.15) 0%,
-                transparent 150px
-            );
-        z-index: -2;
-        pointer-events: none;
-        border-radius: 50px;
-        opacity: 0.6;
-    }
-    
-    .card-header {
-        flex-direction: column;
-        gap: 10px;
-        text-align: center;
-        align-items: center;
-        margin-bottom: 15px;
-        position: relative;
-        z-index: 3;
-    }
-    
-    .logo {
-        justify-content: center;
-        width: 100%;
-        flex-direction: row;
-        gap: 8px;
-    }
-    
-    h1 {
-        font-size: 1.2rem;
-        text-align: center;
-        line-height: 1.3;
-        color: var(--text-color);
-        text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
-    }
-    
-    .logo i {
-        font-size: 1.5rem;
-        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.1));
-    }
-    
-    .connection-signal {
-        font-size: 0.7rem;
-        padding: 5px 10px;
-        margin-top: 0;
-        width: auto;
-        margin-left: 0;
-        background: rgba(248, 250, 252, 0.85);
-        backdrop-filter: blur(5px);
-        z-index: 3;
-        border: 1px solid rgba(226, 232, 240, 0.6);
-    }
-    
-    .info-card-3d {
-        padding: 15px;
-        margin-bottom: 12px;
-        border-radius: 16px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        background: rgba(248, 250, 252, 0.85);
-        backdrop-filter: blur(8px);
-        position: relative;
-        z-index: 3;
-        border: 1px solid rgba(226, 232, 240, 0.6);
-    }
-    
-    .card-label {
-        font-size: 0.85rem;
-        margin-bottom: 10px;
-        justify-content: center;
-        width: 100%;
-    }
-    
-    .saldo-display {
-        flex-direction: row;
-        gap: 6px;
-        margin-bottom: 10px;
-        min-height: 40px;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-    }
-    
-    .currency {
-        font-size: 1.5rem;
-        align-self: center;
-    }
-    
-    /* EFEK KILAU MOBILE YANG DIOPTIMALKAN */
-    .amount {
-        font-size: 1.6rem;
-        line-height: 1;
-        padding: 0;
-        white-space: nowrap;
-        overflow-x: auto;
-        overflow-y: hidden;
-        text-overflow: ellipsis;
-        max-width: calc(100% - 40px);
-        align-self: center;
-        text-align: center;
-        color: var(--text-color);
-        position: relative;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    }
-    
-    /* Gunakan efek kilau yang lebih ringan untuk mobile */
-    .amount::before {
-        content: attr(data-text);
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(
-            90deg,
-            transparent 0%,
-            var(--accent-color) 25%,
-            var(--accent-color) 35%,
-            transparent 45%
-        );
-        -webkit-background-clip: text;
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-size: 300% 100%;
-        animation: shimmer-mobile 4s infinite linear;
-        opacity: 0.7;
-        z-index: 1;
-        pointer-events: none;
-    }
-    
-    .amount::after {
-        content: attr(data-text);
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        color: var(--text-color);
-        z-index: 0;
-    }
-    
-    /* Animasi yang lebih lambat dan smooth untuk mobile */
-    @keyframes shimmer-mobile {
-        0% {
-            background-position: -300% 0;
-        }
-        100% {
-            background-position: 300% 0;
-        }
-    }
-    
-    /* Alternatif efek kilau yang sangat ringan untuk device lemah */
-    .amount.light-shimmer {
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .amount.light-shimmer::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 50%;
-        height: 100%;
-        background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(255, 255, 255, 0.3),
-            transparent
-        );
-        animation: light-shimmer 2s infinite;
-    }
-    
-    @keyframes light-shimmer {
-        0% {
-            left: -100%;
-        }
-        100% {
-            left: 200%;
-        }
-    }
-    
-    .amount.error {
-        font-size: 0.9rem;
-        white-space: normal;
-        text-align: center;
-    }
-    
-    .amount.empty {
-        font-size: 0.9rem;
-        white-space: normal;
-        text-align: center;
-    }
-    
-    .connection-status {
-        font-size: 0.7rem;
-        flex-direction: row;
-        gap: 5px;
-        margin-top: 8px;
-        align-items: center;
-        justify-content: center;
-        flex-wrap: wrap;
-        text-align: center;
-        width: 100%;
-    }
-    
-    .time-card-3d {
-        padding: 12px;
-        margin-bottom: 12px;
-        border-radius: 15px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        background: rgba(240, 240, 240, 0.85);
-        backdrop-filter: blur(8px);
-        position: relative;
-        z-index: 3;
-        border: 1px solid rgba(200, 200, 200, 0.5);
-    }
-    
-    .time-label {
-        font-size: 0.8rem;
-        margin-bottom: 6px;
-        justify-content: center;
-        width: 100%;
-    }
-    
-    .time-display {
-        font-size: 0.85rem;
-        line-height: 1.2;
-        min-height: 20px;
-        padding: 0 5px;
-        text-align: center;
-        word-break: break-word;
-        overflow-wrap: break-word;
-        hyphens: auto;
-    }
-    
-    /* Stats mobile */
-    .stats {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        grid-template-rows: auto auto;
-        gap: 8px 10px;
-        padding: 15px;
-        margin-bottom: 12px;
-        border-radius: 12px;
-        width: 100%;
-        box-sizing: border-box;
-        background: rgba(241, 245, 249, 0.82);
-        backdrop-filter: blur(8px);
-        position: relative;
-        z-index: 3;
-        border: 1px solid rgba(226, 232, 240, 0.5);
-    }
-    
-    .stat-item {
-        display: contents;
-    }
-    
-    .stat-icon {
-        grid-row: 1;
-        justify-self: center;
-        align-self: center;
-        width: 40px;
-        height: 40px;
-        font-size: 1rem;
-        background: var(--stat-icon-gradient);
-        backdrop-filter: blur(5px);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-    }
-    
-    .stat-info {
-        grid-row: 2;
-        text-align: center;
-        align-items: center;
-        justify-content: center;
-        white-space: normal;
-    }
-    
-    .stat-divider {
-        display: none;
-    }
-
-    .stat-value {
-        font-size: 1rem;
-        font-weight: 700;
-        color: var(--text-color);
-        line-height: 1.2;
-    }
-    
-    .stat-label {
-        font-size: 0.7rem;
-        color: var(--text-secondary);
-        font-weight: 500;
-        margin-top: 2px;
-        line-height: 1.1;
-    }
-    
-    .footer-3d {
-        font-size: 0.75rem;
-        padding: 0 5px;
-        width: 100%;
-        text-align: center;
-        position: relative;
-        z-index: 3;
-    }
-    
-    .footer-3d p {
-        font-size: 0.7rem;
-        text-align: center;
-        flex-direction: row;
-        gap: 5px;
-        margin-bottom: 8px;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    .footer-3d p i {
-        font-size: 0.8rem;
-    }
-    
-    .connection-status i {
-        font-size: 0.6rem;
-        margin-bottom: 0;
-        flex-shrink: 0;
-    }
-    
-    .connection-status span {
-        line-height: 1.2;
-        text-align: center;
-    }
-    
-    .watermark {
-        margin-top: 15px;
-        font-size: 0.7rem;
-        padding: 0 10px;
-        flex-wrap: wrap;
-        justify-content: center;
-        text-align: center;
-        color: rgba(255, 255, 255, 0.95);
-        text-shadow: 
-            0 1px 3px rgba(0, 0, 0, 0.4),
-            0 0 10px rgba(255, 255, 255, 0.2);
-        position: relative;
-        z-index: 2;
-    }
-    
-    .signal-bars {
-        height: 12px;
-    }
-    
-    .signal-bar {
-        width: 2px;
-    }
-    
-    .signal-bar:nth-child(1) { height: 3px; }
-    .signal-bar:nth-child(2) { height: 5px; }
-    .signal-bar:nth-child(3) { height: 7px; }
-    .signal-bar:nth-child(4) { height: 9px; }
-    
-    @keyframes cardEntranceMobile {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    .card-3d {
-        animation: cardEntranceMobile 0.8s ease-out;
-    }
 }
 
-/* Mobile landscape - Optimalkan bubble posisi */
-@media (max-width: 480px) and (orientation: landscape) {
-    body {
-        padding: 5px;
-        justify-content: flex-start;
-        min-height: 100vh;
-    }
-    
-    .app-container {
-        margin-top: 10px;
-        max-height: 90vh;
-        overflow-y: auto;
-    }
-    
-    .card-3d {
-        padding: 12px;
-        max-height: 90vh;
-        overflow-y: auto;
-        margin-top: 20px;
-        margin-bottom: 20px;
-    }
-    
-    /* Adjust bubble untuk landscape dengan posisi Y yang keluar */
-    .shape-1 {
-        width: 150px;
-        height: 150px;
-        top: -30px !important;
-        left: -25px !important;
-    }
-    
-    .shape-2 {
-        width: 120px;
-        height: 120px;
-        bottom: -25px !important;
-        right: -20px !important;
-    }
-    
-    .shape-3 {
-        width: 100px;
-        height: 100px;
-        top: 50% !important;
-        left: 95% !important;
-    }
-    
-    .saldo-display {
-        flex-direction: row;
-        gap: 6px;
-    }
-    
-    .stats {
-        flex-direction: row;
-        gap: 8px;
-        padding: 10px;
-        align-items: center;
-        grid-template-columns: repeat(3, 1fr);
-        grid-template-rows: auto;
-        display: grid;
-    }
-    
-    .stat-item {
-        display: contents;
-    }
-    
-    .stat-icon {
-        grid-row: 1;
-        grid-column: span 1;
-        width: 35px;
-        height: 35px;
-    }
-    
-    .stat-info {
-        grid-row: 2;
-        grid-column: span 1;
-        align-items: center;
-        text-align: center;
-        flex-direction: column;
-    }
-    
-    .stat-divider {
-        display: none;
-    }
-    
-    .time-display {
-        font-size: 0.8rem;
-    }
-}
+// ==================== FUNGSI DEBUG (untuk console) ====================
+window.debugFetch = function() {
+    console.log("🔧 Debug: Manual fetch");
+    fetchSaldo();
+};
 
-/* Layar sangat kecil (< 360px) */
-@media (max-width: 360px) {
-    .card-3d {
-        padding: 12px;
-        margin-top: 25px;
-        margin-bottom: 25px;
-    }
-    
-    h1 {
-        font-size: 1.1rem;
-    }
-    
-    /* Adjust bubble untuk layar sangat kecil dengan posisi Y keluar */
-    .shape-1 {
-        width: 170px;
-        height: 170px;
-        top: -40px !important;
-        left: -35px !important;
-    }
-    
-    .shape-2 {
-        width: 130px;
-        height: 130px;
-        bottom: -35px !important;
-        right: -25px !important;
-    }
-    
-    .shape-3 {
-        width: 110px;
-        height: 110px;
-        top: 45% !important;
-        left: 85% !important;
-    }
-    
-    .saldo-display {
-        gap: 4px;
-        justify-content: center;
-    }
-    
-    .currency {
-        font-size: 1.3rem;
-    }
-    
-    .amount {
-        font-size: 1.4rem;
-        text-align: center;
-    }
-    
-    .time-display {
-        font-size: 0.75rem;
-        text-align: center;
-    }
-    
-    .stats {
-        gap: 8px;
-        padding: 10px;
-    }
-    
-    .stat-item {
-        gap: 6px;
-    }
-    
-    .stat-icon {
-        width: 35px;
-        height: 35px;
-        font-size: 1rem;
-    }
-    
-    .stat-value {
-        font-size: 1rem;
-        text-align: center;
-    }
-    
-    .stat-label {
-        font-size: 0.7rem;
-        text-align: center;
-    }
-}
+window.debugCheckData = function() {
+    console.log("🔧 Debug: Check data state");
+    console.log("Is Refreshing:", isRefreshing);
+    console.log("Retry Count:", retryCount);
+    console.log("Last Fetch:", lastSuccessfulFetch);
+    console.log("Is Online:", isOnline);
+    console.log("Database URL:", DATABASE_URL);
+    console.log("Current Theme:", currentTheme);
+    console.log("Last Saldo:", lastSaldo);
+};
 
-/* Tablet kecil */
-@media (min-width: 481px) and (max-width: 767px) {
-    body {
-        padding: 20px;
-    }
-    
-    .app-container {
-        max-width: 90%;
-        margin: 0 auto;
-    }
-    
-    .card-3d {
-        max-width: 100%;
-        padding: 20px;
-    }
-    
-    /* Adjust bubbles untuk tablet */
-    .shape-1 {
-        width: 200px;
-        height: 200px;
-        top: 10%;
-        left: 5%;
-    }
-    
-    .shape-2 {
-        width: 150px;
-        height: 150px;
-        bottom: 15%;
-        right: 5%;
-    }
-    
-    .shape-3 {
-        width: 120px;
-        height: 120px;
-        top: 70%;
-        left: 80%;
-    }
-    
-    .saldo-display {
-        align-items: center;
-        gap: 8px;
-        justify-content: center;
-    }
-    
-    .currency {
-        align-self: center;
-    }
-    
-    .amount {
-        align-self: center;
-        text-align: center;
-    }
-    
-    .stats {
-        padding: 12px;
-        align-items: center;
-        flex-direction: row;
-        gap: 10px;
-    }
-    
-    .stat-item {
-        justify-content: center;
-        flex-direction: row;
-        text-align: left;
-    }
-    
-    .stat-info {
-        align-items: flex-start;
-        text-align: left;
-        flex-direction: column;
-    }
-    
-    .stat-divider {
-        display: block;
-        height: 35px;
-    }
-}
+window.manualUpdateTime = function() {
+    console.log("🔧 Debug: Manual update time");
+    updateTime();
+};
 
-/* Tablet landscape */
-@media (min-width: 768px) and (max-width: 1024px) {
-    .app-container {
-        max-width: 600px;
-        margin: 0 auto;
-    }
+// Fungsi untuk testing theme
+window.testTheme = function(saldo) {
+    console.log("🎨 Testing theme dengan saldo:", saldo);
+    updateThemeBasedOnSaldo(saldo);
     
-    .card-3d {
-        max-width: 600px;
-        padding: 25px;
+    // Update display dengan saldo dummy
+    const saldoElement = document.getElementById('saldo');
+    if (saldoElement) {
+        const formatted = new Intl.NumberFormat('id-ID').format(saldo);
+        saldoElement.textContent = formatted;
+        saldoElement.className = 'amount';
+        lastSaldo = saldo;
     }
-    
-    .saldo-display {
-        align-items: center;
-        gap: 8px;
-        justify-content: center;
-    }
-    
-    .currency {
-        align-self: center;
-    }
-    
-    .amount {
-        align-self: center;
-        text-align: center;
-    }
-    
-    .stats {
-        padding: 15px;
-        align-items: center;
-        flex-direction: row;
-        gap: 15px;
-    }
-    
-    .stat-item {
-        justify-content: center;
-        flex-direction: row;
-        text-align: left;
-    }
-    
-    .stat-info {
-        align-items: flex-start;
-        text-align: left;
-        flex-direction: column;
-    }
-    
-    .stat-divider {
-        display: block;
-        height: 40px;
-    }
-}
+};
 
-/* Desktop besar */
-@media (min-width: 1025px) {
-    .app-container {
-        max-width: 500px;
-    }
+// Fungsi untuk testing error messages
+window.testError = function(type) {
+    const saldoElement = document.getElementById('saldo');
+    if (!saldoElement) return;
     
-    .saldo-display {
-        align-items: center;
-        gap: 8px;
-        justify-content: center;
+    switch(type) {
+        case 'offline':
+            showError('Offline - cek koneksi internet');
+            updateConnectionStatus('offline');
+            break;
+        case 'timeout':
+            showError('Coba lagi - server lambat');
+            updateConnectionStatus('timeout');
+            break;
+        case 'error':
+            showError('Offline • mencoba menghubungkan');
+            updateConnectionStatus('error');
+            break;
+        case 'loading':
+            showLoadingState();
+            break;
+        case 'success':
+            const testSaldo = 1500000;
+            updateSaldoDisplay({
+                raw: "Rp 15.000.000",
+                numeric: testSaldo,
+                formatted: "15.000.000"
+            });
+            updateThemeBasedOnSaldo(testSaldo);
+            updateConnectionStatus('online');
+            break;
     }
-    
-    .currency {
-        align-self: center;
-    }
-    
-    .amount {
-        align-self: center;
-        text-align: center;
-    }
-    
-    .stats {
-        align-items: center;
-        flex-direction: row;
-        gap: 15px;
-    }
-    
-    .stat-item {
-        justify-content: center;
-        flex-direction: row;
-        text-align: left;
-    }
-    
-    .stat-info {
-        align-items: flex-start;
-        text-align: left;
-        flex-direction: column;
-    }
-    
-    .stat-divider {
-        display: block;
-        height: 40px;
-    }
-}
+};
