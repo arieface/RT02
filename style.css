@@ -284,10 +284,6 @@ h1 {
     font-weight: 800;
     color: #1e293b;
     letter-spacing: -0.5px;
-    background: linear-gradient(135deg, #1e293b, #475569);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
     word-break: keep-all;
     overflow: hidden;
     text-align: center;
@@ -297,27 +293,29 @@ h1 {
     overflow-x: auto;
     overflow-y: hidden;
     position: relative;
-    /* Efek kilau untuk angka saldo */
+    /* PERBAIKAN 5: Efek kilau dari kiri ke kanan untuk seluruh view */
     background: linear-gradient(
         90deg,
         #1e293b 0%,
-        #475569 25%,
-        #667eea 50%,
-        #475569 75%,
+        #475569 45%,
+        #a5b4fc 50%, /* Warna kilau lebih terang */
+        #475569 55%,
         #1e293b 100%
     );
     background-size: 200% 100%;
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: shimmer 3s infinite linear;
+    animation: shimmer-left-to-right 3s infinite linear;
 }
 
-@keyframes shimmer {
+/* PERBAIKAN 5: Keyframe animasi kilau dari kiri ke kanan */
+@keyframes shimmer-left-to-right {
     0% {
-        background-position: -100% 0;
+        background-position: -100% 0; /* Mulai dari kiri */
     }
     100% {
-        background-position: 100% 0;
+        background-position: 100% 0; /* Berakhir di kanan */
     }
 }
 
@@ -833,95 +831,68 @@ h1 {
         text-align: center;
     }
     
-    /* =============== REVISI KHUSUS UNTUK STATS DI PHONE VIEW =============== */
-    /* Stats untuk mobile - Layout 2 baris horizontal */
+    /* =============== REVISI UTAMA UNTUK STATS DI PHONE VIEW =============== */
+    /* Menggunakan CSS Grid untuk memisahkan icon dan deskripsi menjadi 2 baris */
     .stats {
-        flex-direction: column; /* Container utama vertikal */
-        gap: 15px; /* Jarak antar baris */
+        display: grid;
+        /* 3 kolom dengan lebar sama */
+        grid-template-columns: repeat(3, 1fr);
+        /* 2 baris otomatis */
+        grid-template-rows: auto auto;
+        gap: 10px; /* Jarak antar item */
         padding: 15px;
         margin-bottom: 12px;
         border-radius: 12px;
-        justify-content: flex-start;
-        align-items: center; /* Center semua item */
         width: 100%;
         box-sizing: border-box;
     }
     
-    /* Hapus divider untuk tampilan 2 baris */
+    /* Menghilangkan container .stat-item dari layout grid */
+    .stat-item {
+        display: contents; 
+    }
+    
+    /* Menempatkan semua icon di baris pertama (grid-row: 1) */
+    .stat-icon {
+        grid-row: 1;
+        justify-self: center; /* Center icon di dalam kolomnya */
+        margin-bottom: 8px; /* Tambah jarak ke baris deskripsi */
+    }
+    
+    /* Menempatkan semua info (deskripsi) di baris kedua (grid-row: 2) */
+    .stat-info {
+        grid-row: 2;
+        text-align: center; /* Center teks di dalam kolomnya */
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Hapus divider karena tidak relevan dengan layout grid */
     .stat-divider {
         display: none;
     }
     
-    /* Container untuk baris pertama (icon) */
-    .stats-icons-row {
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        width: 100%;
-        gap: 10px;
-    }
-    
-    /* Container untuk baris kedua (deskripsi) */
-    .stats-info-row {
-        display: flex;
-        justify-content: space-around;
-        align-items: center;
-        width: 100%;
-        gap: 10px;
-    }
-    
-    /* Item statistik - Icon di baris pertama */
-    .stat-item {
-        flex-direction: column; /* Icon di atas, teks di bawah */
-        width: calc(33.33% - 10px); /* 3 kolom dengan jarak */
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        padding: 0;
-        margin: 0;
-    }
-    
-    /* Icon untuk baris pertama */
+    /* Style untuk icon dan info agar proporsional di grid */
     .stat-icon {
-        width: 45px;
-        height: 45px;
-        font-size: 1.1rem;
-        flex-shrink: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 5px;
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
     }
-    
-    /* Info untuk baris kedua */
-    .stat-info {
-        display: flex;
-        flex-direction: column; /* Value dan label dalam kolom */
-        align-items: center; /* Center teks */
-        gap: 2px; /* Jarak kecil antara value dan label */
-        text-align: center;
-        white-space: normal;
-        overflow: visible;
-        width: 100%;
-    }
-    
+
     .stat-value {
         font-size: 1rem;
-        line-height: 1.2;
-        text-align: center;
-        color: #1e293b;
         font-weight: 700;
-        white-space: nowrap;
+        color: #1e293b;
+        line-height: 1.2;
     }
     
     .stat-label {
-        font-size: 0.75rem;
-        line-height: 1.2;
-        margin-top: 0;
-        text-align: center;
+        font-size: 0.7rem;
         color: #64748b;
         font-weight: 500;
-        white-space: normal;
+        margin-top: 2px;
+        line-height: 1.1;
+        white-space: normal; /* Biarkan text wrap jika perlu */
     }
     /* =============== END REVISI STATS =============== */
     
