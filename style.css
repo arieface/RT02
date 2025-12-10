@@ -279,6 +279,7 @@ h1 {
     line-height: 1;
 }
 
+/* PERBAIKAN 5: Efek kilau dari kiri ke kanan untuk seluruh view */
 .amount {
     font-size: 2rem;
     font-weight: 800;
@@ -293,29 +294,32 @@ h1 {
     overflow-x: auto;
     overflow-y: hidden;
     position: relative;
-    /* PERBAIKAN 5: Efek kilau dari kiri ke kanan untuk seluruh view */
+    /* Gradient untuk efek kilau - DIUBAH */
     background: linear-gradient(
         90deg,
         #1e293b 0%,
-        #475569 45%,
-        #a5b4fc 50%, /* Warna kilau lebih terang */
-        #475569 55%,
+        #1e293b 30%,
+        #a5b4fc 45%, /* Warna kilau lebih terang */
+        #a5b4fc 50%,
+        #a5b4fc 55%,
+        #1e293b 70%,
         #1e293b 100%
     );
     background-size: 200% 100%;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+    /* Animasi dari kiri ke kanan - DIUBAH */
     animation: shimmer-left-to-right 3s infinite linear;
 }
 
-/* PERBAIKAN 5: Keyframe animasi kilau dari kiri ke kanan */
+/* PERBAIKAN 5: Keyframe animasi kilau dari kiri ke kanan - DIUBAH */
 @keyframes shimmer-left-to-right {
     0% {
-        background-position: -100% 0; /* Mulai dari kiri */
+        background-position: -100% 0; /* Mulai dari luar kiri */
     }
     100% {
-        background-position: 100% 0; /* Berakhir di kanan */
+        background-position: 100% 0; /* Berakhir di luar kanan */
     }
 }
 
