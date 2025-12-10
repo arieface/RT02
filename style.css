@@ -79,6 +79,8 @@ body {
     }
 }
 
+/* ================================ CARD ================================ */
+
 .app-container {
     width: 100%;
     max-width: 500px;
@@ -94,7 +96,7 @@ body {
     backdrop-filter: blur(10px);
     border-radius: 24px;
     padding: 20px;
-    box-shadow: 
+    box-shadow:
         0 20px 40px rgba(0, 0, 0, 0.15),
         0 15px 30px rgba(0, 0, 0, 0.12),
         inset 0 1px 0 rgba(255, 255, 255, 0.6);
@@ -104,7 +106,6 @@ body {
     position: relative;
     overflow: hidden;
     width: 100%;
-    max-width: 100%;
 }
 
 .card-3d::before {
@@ -119,49 +120,123 @@ body {
 }
 
 @keyframes cardEntrance {
-    from {
-        opacity: 0;
-        transform: translateY(50px) rotateX(10deg);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) rotateX(0);
-    }
+    from { opacity: 0; transform: translateY(50px) rotateX(10deg); }
+    to { opacity: 1; transform: translateY(0) rotateX(0); }
 }
 
-/* ======================== RESPONSIVE ======================== */
+/* ================================ SALDO ================================ */
 
+.card-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    color: #64748b;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.card-label i { color: #667eea; }
+
+.saldo-display {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    white-space: nowrap;
+}
+
+.currency {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #667eea;
+}
+
+.amount {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1e293b;
+}
+
+/* ================================ TIME ================================ */
+
+.time-card-3d {
+    background: #eee;
+    border-radius: 16px;
+    padding: 15px;
+}
+
+.time-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: 0.8rem;
+}
+
+.time-display {
+    text-align: center;
+    font-weight: 600;
+}
+
+/* ================================ STATS ================================ */
+
+.stats {
+    display: flex;
+    justify-content: space-around;
+    background: rgba(241, 245, 249, 0.8);
+    border-radius: 14px;
+    padding: 15px;
+    gap: 20px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+}
+
+.stat-icon {
+    width: 35px;
+    height: 35px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+}
+
+/* ================================ RESPONSIVE ================================ */
+
+/* PHONE VIEW */
 @media (max-width: 480px) {
-
-    body {
-        padding: 15px 10px;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        display: flex;
-        overflow-y: auto;
-    }
-
-    .floating-shapes {
-        display: none;
-    }
 
     .card-header {
         flex-direction: column;
-        gap: 12px;
         text-align: center;
-        align-items: center;
-        margin-bottom: 15px;
-    }
-
-    .logo {
-        justify-content: center;
+        gap: 10px;
     }
 
     .card-label {
         justify-content: center;
         text-align: center;
-        width: 100%;
     }
 
     .saldo-display {
@@ -169,87 +244,56 @@ body {
         text-align: center;
     }
 
-    /* ===================== STAT FIX ===================== */
-
+    /* ======== VERTICAL LIST ======== */
     .stats {
         flex-direction: column;
         align-items: stretch;
-        justify-content: flex-start;
         gap: 8px;
         padding: 10px 12px;
-        margin-bottom: 12px;
-        border-radius: 12px;
-        flex-wrap: nowrap;
     }
 
     .stat-item {
-        display: flex;
         flex-direction: row;
         justify-content: flex-start;
-        align-items: center;
-        gap: 8px;
         width: 100%;
     }
 
     .stat-icon {
         width: 30px;
         height: 30px;
-        font-size: 0.8rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
     }
 
-    /* ⬇️ Ini yang bikin icon + teks satu baris */
+    /* ======== INLINE TEXT FIX ======== */
     .stat-info {
         display: flex;
-        flex-direction: row;
+        flex-direction: row;   /* satu baris */
         align-items: baseline;
-        text-align: left;
-        white-space: nowrap;
         gap: 4px;
+        white-space: nowrap;  /* cegah turun baris */
     }
 
     .stat-value {
         font-size: 0.95rem;
-        line-height: 1.1;
-        text-align: left;
     }
 
     .stat-label {
         font-size: 0.7rem;
-        line-height: 1;
         margin-top: 0;
-        text-align: left;
     }
 
     .stat-divider {
         width: 100%;
         height: 1px;
-        margin: 4px 0;
         background: rgba(203, 213, 224, 0.5);
     }
 }
 
-/* ======================== OTHER BREAKPOINTS ======================== */
-
-@media (min-width: 481px) and (max-width: 767px) {
-    .stats {
-        padding: 12px;
-        align-items: center;
-    }
+/* TABLET */
+@media (min-width: 481px) and (max-width: 1024px) {
+    .stats { padding: 12px; }
 }
 
-@media (min-width: 768px) and (max-width: 1024px) {
-    .stats {
-        padding: 15px;
-        align-items: center;
-    }
-}
-
+/* DESKTOP */
 @media (min-width: 1025px) {
-    .stats {
-        align-items: center;
-    }
+    .stats { align-items: center; }
 }
