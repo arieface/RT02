@@ -6,7 +6,7 @@
 
 body {
     font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #40E0D0 0%, #006994 100%);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -115,7 +115,7 @@ body {
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, #667eea, #764ba2);
+    background: linear-gradient(90deg, #40E0D0, #006994);
     border-radius: 24px 24px 0 0;
 }
 
@@ -148,11 +148,11 @@ body {
 
 .logo i {
     font-size: 2rem;
-    color: #667eea;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #40E0D0;
+    background: linear-gradient(135deg, #40E0D0, #006994);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 2px 4px rgba(102, 126, 234, 0.3));
+    filter: drop-shadow(0 2px 4px rgba(64, 224, 208, 0.3));
 }
 
 h1 {
@@ -254,7 +254,7 @@ h1 {
 }
 
 .card-label i {
-    color: #667eea;
+    color: #40E0D0;
     font-size: 1rem;
 }
 
@@ -274,8 +274,8 @@ h1 {
 .currency {
     font-size: 1.8rem;
     font-weight: 700;
-    color: #667eea;
-    text-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
+    color: #40E0D0;
+    text-shadow: 0 2px 4px rgba(64, 224, 208, 0.2);
     line-height: 1;
 }
 
@@ -299,7 +299,7 @@ h1 {
         90deg,
         #1e293b 0%,
         #475569 45%,
-        #a5b4fc 50%,
+        #7FDBDA 50%,
         #475569 55%,
         #1e293b 100%
     );
@@ -373,16 +373,16 @@ h1 {
     right: 0;
     height: 4px;
     background: linear-gradient(90deg, 
-        #c0c0c0, 
-        #f0f0f0, 
-        #ffffff,
-        #f0f0f0,
-        #c0c0c0);
+        #7FDBDA, 
+        #5AB9C7, 
+        #40E0D0,
+        #5AB9C7,
+        #7FDBDA);
     border-radius: 16px 16px 0 0;
     opacity: 0.9;
     box-shadow: 
-        0 2px 15px rgba(192, 192, 192, 0.5),
-        0 0 25px rgba(255, 255, 255, 0.4);
+        0 2px 15px rgba(127, 219, 218, 0.5),
+        0 0 25px rgba(64, 224, 208, 0.4);
 }
 
 .time-card-3d::after {
@@ -464,14 +464,14 @@ h1 {
 .stat-icon {
     width: 35px;
     height: 35px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #40E0D0, #006994);
     border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     font-size: 0.9rem;
-    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 8px rgba(64, 224, 208, 0.3);
     flex-shrink: 0;
 }
 
@@ -622,7 +622,7 @@ h1 {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: #667eea;
+    background: #40E0D0;
     animation: dotBounce 1.4s infinite ease-in-out both;
 }
 
