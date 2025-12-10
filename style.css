@@ -142,11 +142,10 @@ body {
     display: flex;
     align-items: center;
     gap: 12px;
-    justify-content: flex-start; /* Align kiri */
-    flex: 1; /* Ambil ruang yang tersedia */
+    justify-content: flex-start;
+    flex: 1;
 }
 
-/* Ganti icon dengan bank (university) */
 .logo i {
     font-size: 2rem;
     color: #667eea;
@@ -161,10 +160,9 @@ h1 {
     font-size: 1.5rem;
     font-weight: 700;
     letter-spacing: -0.3px;
-    text-align: left; /* Align kiri */
+    text-align: left;
 }
 
-/* Ganti badge dengan connection signal */
 .connection-signal {
     display: flex;
     align-items: center;
@@ -177,7 +175,7 @@ h1 {
     color: #475569;
     border: 1px solid rgba(226, 232, 240, 0.8);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    margin-left: 10px; /* Spacing dari logo */
+    margin-left: 10px;
 }
 
 .signal-bars {
@@ -279,6 +277,7 @@ h1 {
     line-height: 1;
 }
 
+/* VERSI LASER DENGAN EFEK BERDENYUT (PULSE) */
 .amount {
     font-size: 2rem;
     font-weight: 800;
@@ -293,49 +292,26 @@ h1 {
     overflow-x: auto;
     overflow-y: hidden;
     position: relative;
-    /* EFEK LASER CYAN FUTURISTIK */
+    /* LASER DENGAN EFEK PULSE */
     background: linear-gradient(
         90deg,
         #1e293b 0%,
-        #1e293b 35%,
-        transparent 40%,
-        #00ffff 45%,      /* CYAN TERANG */
-        #00ffff 50%,      /* INTI LASER */
-        #00ffff 55%,      /* CYAN TERANG */
-        transparent 60%,
-        #1e293b 65%,
+        #1e293b 48%,
+        transparent 49%,
+        rgba(255, 255, 255, 0.95) 50%,
+        transparent 51%,
+        #1e293b 52%,
         #1e293b 100%
     );
-    background-size: 250% 100%;
+    background-size: 130% 100%;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: laser-cyber 2.5s infinite linear;
+    /* ANIMASI DENGAN TIMING FUNCTION UNTUK EFEK BERDENYUT */
+    animation: laser-pulse-scan 7s infinite ease-in-out;
 }
 
-/* PULSE EFFECT */
-.amount::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-        90deg,
-        transparent 0%,
-        transparent 45%,
-        rgba(0, 255, 255, 0.4) 50%,
-        transparent 55%,
-        transparent 100%
-    );
-    background-size: 250% 100%;
-    animation: laser-cyber 2.5s infinite linear;
-    z-index: -1;
-    filter: blur(8px);
-}
-
-/* GLOW TEXT EFFECT */
+/* EFEK GLOW TAMBAHAN UNTUK PULSE LASER */
 .amount::after {
     content: attr(data-content);
     position: absolute;
@@ -346,39 +322,39 @@ h1 {
     background: linear-gradient(
         90deg,
         transparent 0%,
-        transparent 48%,
-        rgba(0, 255, 255, 0.7) 50%,
-        transparent 52%,
+        transparent 49%,
+        rgba(255, 255, 255, 0.4) 50%,
+        transparent 51%,
         transparent 100%
     );
-    background-size: 250% 100%;
+    background-size: 130% 100%;
     -webkit-background-clip: text;
     background-clip: text;
-    animation: laser-cyber 2.5s infinite linear;
+    -webkit-text-fill-color: transparent;
+    animation: laser-pulse-scan 7s infinite ease-in-out;
     z-index: 1;
+    pointer-events: none;
+    opacity: 0.6;
 }
 
-@keyframes laser-cyber {
+/* ANIMASI DENGAN EFEK BERDENYUT */
+@keyframes laser-pulse-scan {
     0% {
-        background-position: 250% 0;
+        background-position: 130% 0;
+        opacity: 0.85;
     }
-    100% {
-        background-position: -250% 0;
-    }
-}
-
-/* ANIMASI GLOW LASER (lebih cepat untuk efek berdenyut) */
-@keyframes laser-glow {
-    0% {
-        background-position: 200% 0;
-        opacity: 0.8;
+    20% {
+        opacity: 1;
     }
     50% {
+        opacity: 0.9;
+    }
+    80% {
         opacity: 1;
     }
     100% {
-        background-position: -200% 0;
-        opacity: 0.8;
+        background-position: -30% 0;
+        opacity: 0.85;
     }
 }
 
@@ -394,7 +370,7 @@ h1 {
 }
 
 .amount.error::after {
-    display: none; /* Hilangkan efek laser saat error */
+    display: none;
 }
 
 .amount.empty {
@@ -407,7 +383,7 @@ h1 {
 }
 
 .amount.empty::after {
-    display: none; /* Hilangkan efek laser saat empty */
+    display: none;
 }
 
 @keyframes shake {
@@ -415,31 +391,7 @@ h1 {
     10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
     20%, 40%, 60%, 80% { transform: translateX(5px); }
 }
-/* PERBAIKAN 3: Ganti warna error menjadi orange untuk "Coba" */
-.amount.error {
-    font-size: 1.1rem;
-    color: #f97316;
-    background: none;
-    -webkit-text-fill-color: #f97316;
-    font-weight: 600;
-    animation: shake 0.5s ease;
-    white-space: normal;
-}
 
-.amount.empty {
-    font-size: 1.1rem;
-    color: #f59e0b;
-    background: none;
-    -webkit-text-fill-color: #f59e0b;
-    font-weight: 600;
-    white-space: normal;
-}
-
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-    20%, 40%, 60%, 80% { transform: translateX(5px); }
-}
 /* Background time-card */
 .time-card-3d {
     background: linear-gradient(145deg, #f0f0f0, #e0e0e0);
@@ -618,13 +570,12 @@ h1 {
 .footer-3d p {
     margin-bottom: 10px;
     display: flex;
-    align-items: center; /* Icon sejajar dengan teks */
+    align-items: center;
     justify-content: center;
     gap: 6px;
     font-size: 0.8rem;
 }
 
-/* PERBAIKAN 2: Icon di footer sejajar vertikal */
 .footer-3d p i {
     font-size: 0.9rem;
     vertical-align: middle;
@@ -699,7 +650,6 @@ h1 {
     color: #10b981;
 }
 
-/* PERBAIKAN 3: Ganti error menjadi offline */
 .connection-status.offline i {
     color: #ef4444;
     animation: blink 1s infinite;
@@ -755,7 +705,6 @@ h1 {
 @media (max-width: 480px) {
     body {
         padding: 15px 10px;
-        /* PERBAIKAN 2: Posisi Y axis untuk center di phone */
         justify-content: center;
         align-items: center;
         min-height: 100vh;
@@ -797,7 +746,6 @@ h1 {
         border-radius: 20px;
     }
     
-    /* PERBAIKAN 1: Header mobile */
     .card-header {
         flex-direction: column;
         gap: 12px;
@@ -807,7 +755,7 @@ h1 {
     }
     
     .logo {
-        justify-content: center; /* Center di mobile */
+        justify-content: center;
         width: 100%;
         flex-direction: row;
         gap: 10px;
@@ -815,7 +763,7 @@ h1 {
     
     h1 {
         font-size: 1.2rem;
-        text-align: center; /* Center di mobile */
+        text-align: center;
         line-height: 1.3;
     }
     
@@ -828,35 +776,33 @@ h1 {
         padding: 5px 10px;
         margin-top: 5px;
         width: auto;
-        margin-left: 0; /* Reset untuk mobile */
+        margin-left: 0;
     }
     
-    /* PERBAIKAN: Info card dan saldo display di tengah */
     .info-card-3d {
         padding: 15px;
         margin-bottom: 12px;
         border-radius: 15px;
         display: flex;
         flex-direction: column;
-        align-items: center; /* Center semua konten */
+        align-items: center;
         text-align: center;
     }
     
     .card-label {
         font-size: 0.85rem;
         margin-bottom: 10px;
-        justify-content: center; /* Center icon dan label */
+        justify-content: center;
         width: 100%;
     }
     
-    /* PERBAIKAN: Saldo display di tengah */
     .saldo-display {
         flex-direction: row;
         gap: 6px;
         margin-bottom: 10px;
         min-height: 40px;
         align-items: center;
-        justify-content: center; /* Center horizontal */
+        justify-content: center;
         width: 100%;
     }
     
@@ -865,6 +811,7 @@ h1 {
         align-self: center;
     }
     
+    /* LASER PULSE UNTUK MOBILE */
     .amount {
         font-size: 1.6rem;
         line-height: 1;
@@ -875,7 +822,48 @@ h1 {
         text-overflow: ellipsis;
         max-width: calc(100% - 40px);
         align-self: center;
-        text-align: center; /* Center text */
+        text-align: center;
+        /* Laser pulse untuk mobile - lebih lambat */
+        background: linear-gradient(
+            90deg,
+            #1e293b 0%,
+            #1e293b 48%,
+            transparent 49%,
+            rgba(255, 255, 255, 0.95) 50%,
+            transparent 51%,
+            #1e293b 52%,
+            #1e293b 100%
+        );
+        background-size: 120% 100%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: laser-pulse-scan-mobile 8s infinite ease-in-out;
+    }
+    
+    /* Sembunyikan efek ::after di mobile untuk performa */
+    .amount::after {
+        display: none;
+    }
+    
+    @keyframes laser-pulse-scan-mobile {
+        0% {
+            background-position: 120% 0;
+            opacity: 0.85;
+        }
+        20% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.9;
+        }
+        80% {
+            opacity: 1;
+        }
+        100% {
+            background-position: -20% 0;
+            opacity: 0.85;
+        }
     }
     
     .amount.error {
@@ -890,7 +878,6 @@ h1 {
         text-align: center;
     }
     
-    /* PERBAIKAN: Connection status di tengah */
     .connection-status {
         font-size: 0.7rem;
         flex-direction: row;
@@ -909,13 +896,13 @@ h1 {
         border-radius: 15px;
         display: flex;
         flex-direction: column;
-        align-items: center; /* Center konten */
+        align-items: center;
     }
     
     .time-label {
         font-size: 0.8rem;
         margin-bottom: 6px;
-        justify-content: center; /* Center icon dan label */
+        justify-content: center;
         width: 100%;
     }
     
@@ -927,15 +914,12 @@ h1 {
         text-align: center;
     }
     
-    /* =============== REVISI UTAMA UNTUK STATS DI PHONE VIEW =============== */
-    /* Menggunakan CSS Grid untuk memisahkan icon dan deskripsi menjadi 2 baris */
+    /* STATS LAYOUT GRID UNTUK MOBILE */
     .stats {
         display: grid;
-        /* 3 kolom dengan lebar sama */
         grid-template-columns: repeat(3, 1fr);
-        /* 2 baris otomatis */
         grid-template-rows: auto auto;
-        gap: 8px 15px; /* Jarak vertikal 8px, horizontal 15px */
+        gap: 8px 15px;
         padding: 15px;
         margin-bottom: 12px;
         border-radius: 12px;
@@ -943,31 +927,27 @@ h1 {
         box-sizing: border-box;
     }
     
-    /* Menghilangkan container .stat-item dari layout grid */
     .stat-item {
         display: contents; 
     }
     
-    /* Menempatkan semua icon di baris pertama (grid-row: 1) */
     .stat-icon {
         grid-row: 1;
-        justify-self: center; /* Center icon di dalam kolomnya */
+        justify-self: center;
         align-self: center;
         width: 40px;
         height: 40px;
         font-size: 1rem;
     }
     
-    /* Menempatkan semua info (deskripsi) di baris kedua (grid-row: 2) */
     .stat-info {
         grid-row: 2;
-        text-align: center; /* Center teks di dalam kolomnya */
+        text-align: center;
         align-items: center;
         justify-content: center;
-        white-space: normal; /* Biarkan text wrap jika perlu */
+        white-space: normal;
     }
     
-    /* Hapus divider karena tidak relevan dengan layout grid */
     .stat-divider {
         display: none;
     }
@@ -986,9 +966,7 @@ h1 {
         margin-top: 2px;
         line-height: 1.1;
     }
-    /* =============== END REVISI STATS =============== */
     
-    /* PERBAIKAN 2: Footer untuk mobile */
     .footer-3d {
         font-size: 0.75rem;
         padding: 0 5px;
@@ -1049,7 +1027,6 @@ h1 {
         hyphens: auto;
     }
     
-    /* Animasi khusus untuk mobile */
     @keyframes cardEntranceMobile {
         from {
             opacity: 0;
@@ -1066,7 +1043,7 @@ h1 {
     }
 }
 
-/* Untuk tablet kecil - TIDAK DIUBAH */
+/* Untuk tablet kecil */
 @media (min-width: 481px) and (max-width: 767px) {
     body {
         padding: 20px;
@@ -1122,7 +1099,7 @@ h1 {
     }
 }
 
-/* Untuk tablet landscape - TIDAK DIUBAH */
+/* Untuk tablet landscape */
 @media (min-width: 768px) and (max-width: 1024px) {
     .app-container {
         max-width: 600px;
@@ -1174,7 +1151,7 @@ h1 {
     }
 }
 
-/* Untuk desktop besar - TIDAK DIUBAH */
+/* Untuk desktop besar */
 @media (min-width: 1025px) {
     .app-container {
         max-width: 500px;
@@ -1219,7 +1196,7 @@ h1 {
     }
 }
 
-/* Landscape mode untuk mobile - Disesuaikan dengan layout baru */
+/* Landscape mode untuk mobile */
 @media (max-width: 480px) and (orientation: landscape) {
     body {
         padding: 10px;
@@ -1269,7 +1246,7 @@ h1 {
     }
 }
 
-/* Perangkat dengan layar sangat kecil - Disesuaikan dengan layout baru */
+/* Perangkat dengan layar sangat kecil */
 @media (max-width: 360px) {
     .card-3d {
         padding: 12px;
