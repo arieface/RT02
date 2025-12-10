@@ -263,7 +263,7 @@ h1 {
     display: flex;
     align-items: baseline;
     justify-content: center;
-    gap: 8px; /* Ditambah dari 4px ke 8px */
+    gap: 8px;
     margin-bottom: 12px;
     min-height: 50px;
     flex-wrap: nowrap;
@@ -279,7 +279,6 @@ h1 {
     line-height: 1;
 }
 
-/* PERBAIKAN 5: Efek kilau dari kiri ke kanan untuk seluruh view */
 .amount {
     font-size: 2rem;
     font-weight: 800;
@@ -294,39 +293,39 @@ h1 {
     overflow-x: auto;
     overflow-y: hidden;
     position: relative;
-    /* Gradient untuk efek kilau - DIUBAH */
+    /* PERBAIKAN 5: Efek kilau dari kiri ke kanan - VERSI BENAR */
     background: linear-gradient(
         90deg,
         #1e293b 0%,
-        #1e293b 30%,
-        #a5b4fc 45%, /* Warna kilau lebih terang */
-        #a5b4fc 50%,
-        #a5b4fc 55%,
-        #1e293b 70%,
+        #1e293b 25%,
+        #ffffff 35%,     /* Kilau putih terang */
+        #a5b4fc 45%,     /* Kilau ungu terang */
+        #ffffff 55%,     /* Kilau putih terang */
+        #1e293b 65%,
         #1e293b 100%
     );
     background-size: 200% 100%;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    /* Animasi dari kiri ke kanan - DIUBAH */
-    animation: shimmer-left-to-right 3s infinite linear;
+    /* ANIMASI DARI KIRI KE KANAN YANG BENAR */
+    animation: shimmer-left-to-right 4s infinite linear;
 }
 
-/* PERBAIKAN 5: Keyframe animasi kilau dari kiri ke kanan - DIUBAH */
+/* PERBAIKAN 5: Keyframe animasi kilau DARI KIRI KE KANAN YANG BENAR */
 @keyframes shimmer-left-to-right {
     0% {
-        background-position: -100% 0; /* Mulai dari luar kiri */
+        background-position: 100% 0;    /* Mulai dari KANAN (kilau di kanan) */
     }
     100% {
-        background-position: 100% 0; /* Berakhir di luar kanan */
+        background-position: -100% 0;   /* Berakhir di KIRI (kilau pindah ke kiri) */
     }
 }
 
 /* PERBAIKAN 3: Ganti warna error menjadi orange untuk "Coba" */
 .amount.error {
     font-size: 1.1rem;
-    color: #f97316; /* Orange untuk "Coba" */
+    color: #f97316;
     background: none;
     -webkit-text-fill-color: #f97316;
     font-weight: 600;
@@ -348,7 +347,6 @@ h1 {
     10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
     20%, 40%, 60%, 80% { transform: translateX(5px); }
 }
-
 /* Background time-card */
 .time-card-3d {
     background: linear-gradient(145deg, #f0f0f0, #e0e0e0);
