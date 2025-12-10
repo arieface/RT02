@@ -1,12 +1,27 @@
+/* ==================== RESET & VARIABLES ==================== */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+:root {
+    /* Default Theme Variables (akan di-override oleh JavaScript) */
+    --theme-gradient-start: #667eea;
+    --theme-gradient-end: #764ba2;
+    --theme-primary: #667eea;
+    --theme-primary-light: rgba(102, 126, 234, 0.3);
+    --theme-shimmer-mid: #a5b4fc;
+    --theme-icon-shadow: rgba(102, 126, 234, 0.3);
+    
+    /* Transition untuk smooth color change */
+    --transition-speed: 0.6s;
+}
+
+/* ==================== BODY & BACKGROUND ==================== */
 body {
     font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--theme-gradient-start) 0%, var(--theme-gradient-end) 100%);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -14,89 +29,7 @@ body {
     align-items: center;
     overflow-x: hidden;
     padding: 20px;
-    transition: background 0.8s ease;
-}
-
-/* Tema Warna Berdasarkan Saldo */
-/* Tema 1: Saldo < 500.000 (Merah dan Hitam) */
-body.low-balance {
-    background: linear-gradient(135deg, #ff5252 0%, #000000 100%);
-}
-
-body.low-balance .card-3d::before {
-    background: linear-gradient(90deg, #ff5252, #000000);
-}
-
-body.low-balance .logo i {
-    color: #ff5252;
-    background: linear-gradient(135deg, #ff5252, #000000);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 2px 4px rgba(255, 82, 82, 0.3));
-}
-
-body.low-balance .currency {
-    color: #ff5252;
-    text-shadow: 0 2px 4px rgba(255, 82, 82, 0.2);
-}
-
-body.low-balance .stat-icon {
-    background: linear-gradient(135deg, #ff5252, #000000);
-    box-shadow: 0 4px 8px rgba(255, 82, 82, 0.3);
-}
-
-/* Tema 2: Saldo 500.000 - 1.000.000 (Merah dan Orange) */
-body.medium-balance {
-    background: linear-gradient(135deg, #ff5252 0%, #ff9800 100%);
-}
-
-body.medium-balance .card-3d::before {
-    background: linear-gradient(90deg, #ff5252, #ff9800);
-}
-
-body.medium-balance .logo i {
-    color: #ff5252;
-    background: linear-gradient(135deg, #ff5252, #ff9800);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 2px 4px rgba(255, 82, 82, 0.3));
-}
-
-body.medium-balance .currency {
-    color: #ff5252;
-    text-shadow: 0 2px 4px rgba(255, 82, 82, 0.2);
-}
-
-body.medium-balance .stat-icon {
-    background: linear-gradient(135deg, #ff5252, #ff9800);
-    box-shadow: 0 4px 8px rgba(255, 82, 82, 0.3);
-}
-
-/* Tema 3: Saldo > 1.000.000 (Hijau Tosca dan Biru Turki) */
-body.high-balance {
-    background: linear-gradient(135deg, #00897b 0%, #0693e3 100%);
-}
-
-body.high-balance .card-3d::before {
-    background: linear-gradient(90deg, #00897b, #0693e3);
-}
-
-body.high-balance .logo i {
-    color: #00897b;
-    background: linear-gradient(135deg, #00897b, #0693e3);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 2px 4px rgba(0, 137, 123, 0.3));
-}
-
-body.high-balance .currency {
-    color: #00897b;
-    text-shadow: 0 2px 4px rgba(0, 137, 123, 0.2);
-}
-
-body.high-balance .stat-icon {
-    background: linear-gradient(135deg, #00897b, #0693e3);
-    box-shadow: 0 4px 8px rgba(0, 137, 123, 0.3);
+    transition: background var(--transition-speed) ease;
 }
 
 .background-3d {
@@ -113,6 +46,7 @@ body.high-balance .stat-icon {
     align-items: center;
 }
 
+/* ==================== FLOATING SHAPES ==================== */
 .floating-shapes {
     position: absolute;
     width: 100%;
@@ -162,7 +96,7 @@ body.high-balance .stat-icon {
     }
 }
 
-/* Container utama untuk centering */
+/* ==================== CONTAINER & CARD ==================== */
 .app-container {
     width: 100%;
     max-width: 500px;
@@ -189,7 +123,6 @@ body.high-balance .stat-icon {
     overflow: hidden;
     width: 100%;
     max-width: 100%;
-    transition: all 0.8s ease;
 }
 
 .card-3d::before {
@@ -199,9 +132,9 @@ body.high-balance .stat-icon {
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, #667eea, #764ba2);
+    background: linear-gradient(90deg, var(--theme-gradient-start), var(--theme-gradient-end));
     border-radius: 24px 24px 0 0;
-    transition: background 0.8s ease;
+    transition: background var(--transition-speed) ease;
 }
 
 @keyframes cardEntrance {
@@ -215,7 +148,23 @@ body.high-balance .stat-icon {
     }
 }
 
-/* Header */
+/* ==================== THEME BADGE ==================== */
+.theme-badge {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--theme-primary);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all var(--transition-speed) ease;
+    z-index: 10;
+}
+
+/* ==================== HEADER ==================== */
 .card-header {
     display: flex;
     justify-content: space-between;
@@ -233,12 +182,12 @@ body.high-balance .stat-icon {
 
 .logo i {
     font-size: 2rem;
-    color: #667eea;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: var(--theme-primary);
+    background: linear-gradient(135deg, var(--theme-gradient-start), var(--theme-gradient-end));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 2px 4px rgba(102, 126, 234, 0.3));
-    transition: all 0.8s ease;
+    filter: drop-shadow(0 2px 4px var(--theme-primary-light));
+    transition: all var(--transition-speed) ease;
 }
 
 h1 {
@@ -249,7 +198,7 @@ h1 {
     text-align: left;
 }
 
-/* Connection signal */
+/* ==================== CONNECTION SIGNAL ==================== */
 .connection-signal {
     display: flex;
     align-items: center;
@@ -293,7 +242,7 @@ h1 {
     background: #ef4444;
 }
 
-/* Info card */
+/* ==================== INFO CARD ==================== */
 .info-card-3d {
     background: linear-gradient(135deg, #f8fafc, #f1f5f9);
     border-radius: 18px;
@@ -306,7 +255,6 @@ h1 {
     transform-style: preserve-3d;
     position: relative;
     overflow: hidden;
-    transition: all 0.8s ease;
 }
 
 .info-card-3d::after {
@@ -341,12 +289,12 @@ h1 {
 }
 
 .card-label i {
-    color: #667eea;
+    color: var(--theme-primary);
     font-size: 1rem;
-    transition: all 0.8s ease;
+    transition: color var(--transition-speed) ease;
 }
 
-/* Saldo display */
+/* ==================== SALDO DISPLAY ==================== */
 .saldo-display {
     display: flex;
     align-items: baseline;
@@ -362,13 +310,12 @@ h1 {
 .currency {
     font-size: 1.8rem;
     font-weight: 700;
-    color: #667eea;
-    text-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
+    color: var(--theme-primary);
+    text-shadow: 0 2px 4px var(--theme-primary-light);
     line-height: 1;
-    transition: all 0.8s ease;
+    transition: all var(--transition-speed) ease;
 }
 
-/* Efek kilau saldo */
 .amount {
     font-size: 2rem;
     font-weight: 800;
@@ -383,12 +330,11 @@ h1 {
     overflow-x: auto;
     overflow-y: hidden;
     position: relative;
-    /* Efek kilau untuk seluruh view */
     background: linear-gradient(
         90deg,
         #1e293b 0%,
         #475569 45%,
-        #a5b4fc 50%,
+        var(--theme-shimmer-mid) 50%,
         #475569 55%,
         #1e293b 100%
     );
@@ -397,21 +343,18 @@ h1 {
     background-clip: text;
     -webkit-text-fill-color: transparent;
     animation: shimmer-left-to-right 3s infinite linear;
+    transition: background var(--transition-speed) ease;
 }
 
-/* CATATAN: background-position bergerak berlawanan dengan arah visual
-   Untuk membuat kilau BERGERAK dari kiri ke kanan, posisi background
-   justru dianimasi dari 100% ke -100% */
 @keyframes shimmer-left-to-right {
     0% {
-        background-position: 100% 0;  /* Gradien digeser ke kanan (kilau tampak di kiri) */
+        background-position: 100% 0;
     }
     100% {
-        background-position: -100% 0; /* Gradien digeser ke kiri (kilau keluar ke kanan) */
+        background-position: -100% 0;
     }
 }
 
-/* Error & empty state */
 .amount.error {
     font-size: 1.1rem;
     color: #f97316;
@@ -437,7 +380,53 @@ h1 {
     20%, 40%, 60%, 80% { transform: translateX(5px); }
 }
 
-/* Time card */
+/* ==================== CONNECTION STATUS ==================== */
+.connection-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 10px;
+    font-size: 0.75rem;
+    color: #64748b;
+    opacity: 0.8;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.connection-status i {
+    font-size: 0.65rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    position: relative;
+    top: 0;
+}
+
+.connection-status span {
+    line-height: 1.2;
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+}
+
+.connection-status.online i {
+    color: #10b981;
+}
+
+.connection-status.offline i {
+    color: #ef4444;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+/* ==================== TIME CARD ==================== */
 .time-card-3d {
     background: linear-gradient(145deg, #f0f0f0, #e0e0e0);
     color: #1f2937;
@@ -528,7 +517,7 @@ h1 {
         0 0 15px rgba(255, 255, 255, 0.4);
 }
 
-/* Stats */
+/* ==================== STATS ==================== */
 .stats {
     display: flex;
     justify-content: space-around;
@@ -553,16 +542,16 @@ h1 {
 .stat-icon {
     width: 35px;
     height: 35px;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, var(--theme-gradient-start), var(--theme-gradient-end));
     border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     font-size: 0.9rem;
-    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 8px var(--theme-icon-shadow);
     flex-shrink: 0;
-    transition: all 0.8s ease;
+    transition: all var(--transition-speed) ease;
 }
 
 .stat-info {
@@ -596,7 +585,7 @@ h1 {
     align-self: center;
 }
 
-/* Footer */
+/* ==================== FOOTER ==================== */
 .footer-3d {
     text-align: center;
     color: #64748b;
@@ -631,7 +620,7 @@ h1 {
     font-weight: 500;
 }
 
-/* Loading dots (text) */
+/* ==================== LOADING DOTS ==================== */
 .loading-dots {
     display: inline-flex;
     gap: 3px;
@@ -652,53 +641,6 @@ h1 {
     50% { opacity: 1; }
 }
 
-/* Connection status */
-.connection-status {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    margin-top: 10px;
-    font-size: 0.75rem;
-    color: #64748b;
-    opacity: 0.8;
-    text-align: center;
-    line-height: 1.2;
-}
-
-.connection-status i {
-    font-size: 0.65rem;
-    line-height: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    vertical-align: middle;
-    position: relative;
-    top: 0;
-}
-
-.connection-status span {
-    line-height: 1.2;
-    display: inline-flex;
-    align-items: center;
-    vertical-align: middle;
-}
-
-.connection-status.online i {
-    color: #10b981;
-}
-
-.connection-status.offline i {
-    color: #ef4444;
-    animation: blink 1s infinite;
-}
-
-@keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-}
-
-/* Loading dots (circle) */
 .loading-dots-container {
     display: inline-flex;
     align-items: center;
@@ -712,8 +654,9 @@ h1 {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: #667eea;
+    background: var(--theme-primary);
     animation: dotBounce 1.4s infinite ease-in-out both;
+    transition: background var(--transition-speed) ease;
 }
 
 .loading-dots-container span:nth-child(1) { 
@@ -738,7 +681,6 @@ h1 {
 }
 
 /* ==================== RESPONSIVE DESIGN ==================== */
-
 @media (max-width: 480px) {
     body {
         padding: 15px 10px;
@@ -816,103 +758,13 @@ h1 {
         margin-left: 0;
     }
     
-    .info-card-3d {
-        padding: 15px;
-        margin-bottom: 12px;
-        border-radius: 15px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
-    
-    .card-label {
-        font-size: 0.85rem;
-        margin-bottom: 10px;
-        justify-content: center;
-        width: 100%;
-    }
-    
-    .saldo-display {
-        flex-direction: row;
-        gap: 6px;
-        margin-bottom: 10px;
-        min-height: 40px;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-    }
-    
-    .currency {
-        font-size: 1.5rem;
-        align-self: center;
-    }
-    
-    .amount {
-        font-size: 1.6rem;
-        line-height: 1;
-        padding: 0;
-        white-space: nowrap;
-        overflow-x: auto;
-        overflow-y: hidden;
-        text-overflow: ellipsis;
-        max-width: calc(100% - 40px);
-        align-self: center;
-        text-align: center;
-    }
-    
-    .amount.error {
-        font-size: 0.9rem;
-        white-space: normal;
-        text-align: center;
-    }
-    
-    .amount.empty {
-        font-size: 0.9rem;
-        white-space: normal;
-        text-align: center;
-    }
-    
-    .connection-status {
+    .theme-badge {
+        top: 10px;
+        right: 10px;
         font-size: 0.7rem;
-        flex-direction: row;
-        gap: 5px;
-        margin-top: 8px;
-        align-items: center;
-        justify-content: center;
-        flex-wrap: wrap;
-        text-align: center;
-        width: 100%;
+        padding: 4px 8px;
     }
     
-    .time-card-3d {
-        padding: 12px;
-        margin-bottom: 12px;
-        border-radius: 15px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .time-label {
-        font-size: 0.8rem;
-        margin-bottom: 6px;
-        justify-content: center;
-        width: 100%;
-    }
-    
-    .time-display {
-        font-size: 0.85rem;
-        line-height: 1.2;
-        min-height: 20px;
-        padding: 0 5px;
-        text-align: center;
-        word-break: break-word;
-        overflow-wrap: break-word;
-        hyphens: auto;
-    }
-    
-    /* Stats mobile: grid 2 baris (icon atas, teks bawah) */
     .stats {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -949,52 +801,17 @@ h1 {
     .stat-divider {
         display: none;
     }
-
-    .stat-value {
-        font-size: 1rem;
-        font-weight: 700;
-        color: #1e293b;
-        line-height: 1.2;
+    
+    .currency {
+        font-size: 1.5rem;
     }
     
-    .stat-label {
-        font-size: 0.7rem;
-        color: #64748b;
-        font-weight: 500;
-        margin-top: 2px;
-        line-height: 1.1;
+    .amount {
+        font-size: 1.6rem;
     }
     
-    .footer-3d {
-        font-size: 0.75rem;
-        padding: 0 5px;
-        width: 100%;
-        text-align: center;
-    }
-    
-    .footer-3d p {
-        font-size: 0.7rem;
-        text-align: center;
-        flex-direction: row;
-        gap: 5px;
-        margin-bottom: 8px;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    .footer-3d p i {
-        font-size: 0.8rem;
-    }
-    
-    .connection-status i {
-        font-size: 0.6rem;
-        margin-bottom: 0;
-        flex-shrink: 0;
-    }
-    
-    .connection-status span {
-        line-height: 1.2;
-        text-align: center;
+    .time-display {
+        font-size: 0.85rem;
     }
     
     .watermark {
@@ -1003,292 +820,6 @@ h1 {
         padding: 0 10px;
         flex-wrap: wrap;
         justify-content: center;
-        text-align: center;
-    }
-    
-    .signal-bars {
-        height: 12px;
-    }
-    
-    .signal-bar {
-        width: 2px;
-    }
-    
-    .signal-bar:nth-child(1) { height: 3px; }
-    .signal-bar:nth-child(2) { height: 5px; }
-    .signal-bar:nth-child(3) { height: 7px; }
-    .signal-bar:nth-child(4) { height: 9px; }
-    
-    @keyframes cardEntranceMobile {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    .card-3d {
-        animation: cardEntranceMobile 0.8s ease-out;
-    }
-}
-
-/* Tablet kecil */
-@media (min-width: 481px) and (max-width: 767px) {
-    body {
-        padding: 20px;
-    }
-    
-    .app-container {
-        max-width: 90%;
-        margin: 0 auto;
-    }
-    
-    .card-3d {
-        max-width: 100%;
-        padding: 20px;
-    }
-    
-    .saldo-display {
-        align-items: center;
-        gap: 8px;
-        justify-content: center;
-    }
-    
-    .currency {
-        align-self: center;
-    }
-    
-    .amount {
-        align-self: center;
-        text-align: center;
-    }
-    
-    .stats {
-        padding: 12px;
-        align-items: center;
-        flex-direction: row;
-        gap: 10px;
-    }
-    
-    .stat-item {
-        justify-content: center;
-        flex-direction: row;
-        text-align: left;
-    }
-    
-    .stat-info {
-        align-items: flex-start;
-        text-align: left;
-        flex-direction: column;
-    }
-    
-    .stat-divider {
-        display: block;
-        height: 35px;
-    }
-}
-
-/* Tablet landscape */
-@media (min-width: 768px) and (max-width: 1024px) {
-    .app-container {
-        max-width: 600px;
-        margin: 0 auto;
-    }
-    
-    .card-3d {
-        max-width: 600px;
-        padding: 25px;
-    }
-    
-    .saldo-display {
-        align-items: center;
-        gap: 8px;
-        justify-content: center;
-    }
-    
-    .currency {
-        align-self: center;
-    }
-    
-    .amount {
-        align-self: center;
-        text-align: center;
-    }
-    
-    .stats {
-        padding: 15px;
-        align-items: center;
-        flex-direction: row;
-        gap: 15px;
-    }
-    
-    .stat-item {
-        justify-content: center;
-        flex-direction: row;
-        text-align: left;
-    }
-    
-    .stat-info {
-        align-items: flex-start;
-        text-align: left;
-        flex-direction: column;
-    }
-    
-    .stat-divider {
-        display: block;
-        height: 40px;
-    }
-}
-
-/* Desktop besar */
-@media (min-width: 1025px) {
-    .app-container {
-        max-width: 500px;
-    }
-    
-    .saldo-display {
-        align-items: center;
-        gap: 8px;
-        justify-content: center;
-    }
-    
-    .currency {
-        align-self: center;
-    }
-    
-    .amount {
-        align-self: center;
-        text-align: center;
-    }
-    
-    .stats {
-        align-items: center;
-        flex-direction: row;
-        gap: 15px;
-    }
-    
-    .stat-item {
-        justify-content: center;
-        flex-direction: row;
-        text-align: left;
-    }
-    
-    .stat-info {
-        align-items: flex-start;
-        text-align: left;
-        flex-direction: column;
-    }
-    
-    .stat-divider {
-        display: block;
-        height: 40px;
-    }
-}
-
-/* Mobile landscape */
-@media (max-width: 480px) and (orientation: landscape) {
-    body {
-        padding: 10px;
-        justify-content: center;
-    }
-    
-    .app-container {
-        margin-top: 5px;
-    }
-    
-    .card-3d {
-        padding: 12px;
-        max-height: 95vh;
-        overflow-y: auto;
-    }
-    
-    .saldo-display {
-        flex-direction: row;
-        gap: 6px;
-    }
-    
-    .stats {
-        flex-direction: row;
-        gap: 10px;
-        padding: 10px;
-        align-items: center;
-    }
-    
-    .stat-item {
-        justify-content: center;
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .stat-info {
-        align-items: center;
-        text-align: center;
-        flex-direction: column;
-    }
-    
-    .stat-divider {
-        display: none;
-    }
-    
-    .time-display {
-        font-size: 0.8rem;
-    }
-}
-
-/* Layar sangat kecil */
-@media (max-width: 360px) {
-    .card-3d {
-        padding: 12px;
-    }
-    
-    h1 {
-        font-size: 1.1rem;
-    }
-    
-    .saldo-display {
-        gap: 4px;
-        justify-content: center;
-    }
-    
-    .currency {
-        font-size: 1.3rem;
-    }
-    
-    .amount {
-        font-size: 1.4rem;
-        text-align: center;
-    }
-    
-    .time-display {
-        font-size: 0.75rem;
-        text-align: center;
-    }
-    
-    .stats {
-        gap: 12px;
-        padding: 10px;
-    }
-    
-    .stat-item {
-        gap: 6px;
-    }
-    
-    .stat-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 1rem;
-    }
-    
-    .stat-value {
-        font-size: 1rem;
-        text-align: center;
-    }
-    
-    .stat-label {
-        font-size: 0.8rem;
         text-align: center;
     }
 }
