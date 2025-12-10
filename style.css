@@ -18,18 +18,18 @@ body {
 }
 
 /* Tema Warna Berdasarkan Saldo */
-/* Tema 1: Saldo < 500.000 (Merah dan Brown) */
+/* Tema 1: Saldo < 500.000 (Merah dan Hitam) */
 body.low-balance {
-    background: linear-gradient(135deg, #ff5252 0%, #8b4513 100%);
+    background: linear-gradient(135deg, #ff5252 0%, #000000 100%);
 }
 
 body.low-balance .card-3d::before {
-    background: linear-gradient(90deg, #ff5252, #8b4513);
+    background: linear-gradient(90deg, #ff5252, #000000);
 }
 
 body.low-balance .logo i {
     color: #ff5252;
-    background: linear-gradient(135deg, #ff5252, #8b4513);
+    background: linear-gradient(135deg, #ff5252, #000000);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     filter: drop-shadow(0 2px 4px rgba(255, 82, 82, 0.3));
@@ -41,7 +41,7 @@ body.low-balance .currency {
 }
 
 body.low-balance .stat-icon {
-    background: linear-gradient(135deg, #ff5252, #8b4513);
+    background: linear-gradient(135deg, #ff5252, #000000);
     box-shadow: 0 4px 8px rgba(255, 82, 82, 0.3);
 }
 
