@@ -293,35 +293,108 @@ h1 {
     overflow-x: auto;
     overflow-y: hidden;
     position: relative;
-    /* PERBAIKAN 5: Efek kilau dari kiri ke kanan - VERSI BENAR */
+    /* EFEK SCAN LASER */
     background: linear-gradient(
         90deg,
         #1e293b 0%,
-        #1e293b 25%,
-        #ffffff 35%,     /* Kilau putih terang ← MULAI KILAU */
-        #a5b4fc 45%,     /* Kilau ungu terang ← PUNCAK KILAU */
-        #ffffff 55%,     /* Kilau putih terang ← AKHIR KILAU */
-        #1e293b 65%,
+        #1e293b 45%,
+        transparent 47%,
+        rgba(255, 255, 255, 0.9) 50%,     /* INTI LASER */
+        transparent 53%,
+        #1e293b 55%,
         #1e293b 100%
     );
-    background-size: 50% 20%;  /* ← LEBAR TOTAL BACKGROUND: 200% */
+    background-size: 200% 100%;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    /* ANIMASI DARI KIRI KE KANAN YANG BENAR */
-    animation: shimmer-left-to-right 4s infinite linear;
+    /* ANIMASI LASER SCAN DARI KIRI KE KANAN */
+    animation: laser-scan 3s infinite linear;
 }
 
-/* PERBAIKAN 5: Keyframe animasi kilau DARI KIRI KE KANAN YANG BENAR */
-@keyframes shimmer-left-to-right {
+/* EFEK GLOW TAMBAHAN UNTUK LASER */
+.amount::after {
+    content: attr(data-content);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent 0%,
+        transparent 47%,
+        rgba(255, 255, 255, 0.3) 50%,     /* GLOW LASER */
+        transparent 53%,
+        transparent 100%
+    );
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: laser-glow 3s infinite linear;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* ANIMASI LASER SCAN UTAMA */
+@keyframes laser-scan {
     0% {
-        background-position: 100% 0;    /* ← POSISI AWAL: 100% ke KANAN */
+        background-position: 200% 0;    /* Laser mulai di luar kanan */
     }
     100% {
-        background-position: -100% 0;   /* ← POSISI AKHIR: 100% ke KIRI */
+        background-position: -200% 0;   /* Laser bergerak ke kiri */
     }
 }
 
+/* ANIMASI GLOW LASER (lebih cepat untuk efek berdenyut) */
+@keyframes laser-glow {
+    0% {
+        background-position: 200% 0;
+        opacity: 0.8;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        background-position: -200% 0;
+        opacity: 0.8;
+    }
+}
+
+/* PERBAIKAN 3: Ganti warna error menjadi orange untuk "Coba" */
+.amount.error {
+    font-size: 1.1rem;
+    color: #f97316;
+    background: none;
+    -webkit-text-fill-color: #f97316;
+    font-weight: 600;
+    animation: shake 0.5s ease;
+    white-space: normal;
+}
+
+.amount.error::after {
+    display: none; /* Hilangkan efek laser saat error */
+}
+
+.amount.empty {
+    font-size: 1.1rem;
+    color: #f59e0b;
+    background: none;
+    -webkit-text-fill-color: #f59e0b;
+    font-weight: 600;
+    white-space: normal;
+}
+
+.amount.empty::after {
+    display: none; /* Hilangkan efek laser saat empty */
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
 /* PERBAIKAN 3: Ganti warna error menjadi orange untuk "Coba" */
 .amount.error {
     font-size: 1.1rem;
