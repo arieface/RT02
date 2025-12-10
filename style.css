@@ -20,10 +20,10 @@
 /* Red Theme - STRAWBERRY DARK RED (Saldo < 500.000) */
 [data-theme="red"] {
     --primary-color: #dc2626;
-    --secondary-color: #991b1b;
+    --secondary-color: #e11d48; /* Warna lebih terang untuk icon */
     --accent-color: #fca5a5;
     --background-gradient: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-    --stat-icon-gradient: linear-gradient(135deg, #dc2626, #991b1b);
+    --stat-icon-gradient: linear-gradient(135deg, #dc2626, #e11d48); /* Gradient lebih terang */
     --danger-color: #b91c1c;
     --warning-color: #ea580c;
 }
@@ -324,7 +324,7 @@ h1 {
     font-size: 1rem;
 }
 
-/* Saldo display */
+/* Saldo display - EFEK KILAU YANG DIOPTIMALKAN */
 .saldo-display {
     display: flex;
     align-items: baseline;
@@ -345,7 +345,7 @@ h1 {
     line-height: 1;
 }
 
-/* Efek kilau saldo */
+/* EFEK KILAU YANG DIOPTIMALKAN - NO LAG */
 .amount {
     font-size: 2rem;
     font-weight: 800;
@@ -360,31 +360,89 @@ h1 {
     overflow-x: auto;
     overflow-y: hidden;
     position: relative;
-    /* Efek kilau untuk seluruh view */
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Efek kilau dengan pseudo-element untuk performance yang lebih baik */
+.amount::before {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     background: linear-gradient(
         90deg,
-        var(--text-color) 0%,
-        var(--text-secondary) 45%,
-        var(--accent-color) 50%,
-        var(--text-secondary) 55%,
-        var(--text-color) 100%
+        transparent 0%,
+        var(--accent-color) 20%,
+        var(--accent-color) 30%,
+        transparent 40%
     );
-    background-size: 200% 100%;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: shimmer-left-to-right 3s infinite linear;
+    background-size: 200% 100%;
+    animation: shimmer-optimized 3s infinite linear;
+    z-index: 1;
+    pointer-events: none;
 }
 
-/* CATATAN: background-position bergerak berlawanan dengan arah visual
-   Untuk membuat kilau BERGERAK dari kiri ke kanan, posisi background
-   justru dianimasi dari 100% ke -100% */
-@keyframes shimmer-left-to-right {
+.amount::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    color: var(--text-color);
+    z-index: 0;
+}
+
+/* Animasi kilau yang lebih smooth untuk mencegah lag */
+@keyframes shimmer-optimized {
     0% {
-        background-position: 100% 0;
+        background-position: -200% 0;
+        opacity: 0.8;
+    }
+    50% {
+        background-position: 200% 0;
+        opacity: 1;
     }
     100% {
-        background-position: -100% 0;
+        background-position: -200% 0;
+        opacity: 0.8;
+    }
+}
+
+/* Alternatif: Efek kilau sederhana untuk device yang lebih lemah */
+.amount.simple-shimmer {
+    position: relative;
+    overflow: hidden;
+}
+
+.amount.simple-shimmer::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 20%;
+    height: 200%;
+    background: linear-gradient(
+        to right,
+        transparent 0%,
+        rgba(255, 255, 255, 0.4) 50%,
+        transparent 100%
+    );
+    transform: rotate(30deg);
+    animation: simple-shimmer 2.5s infinite;
+}
+
+@keyframes simple-shimmer {
+    0% {
+        left: -60%;
+    }
+    100% {
+        left: 140%;
     }
 }
 
@@ -1048,6 +1106,7 @@ h1 {
         align-self: center;
     }
     
+    /* EFEK KILAU MOBILE YANG DIOPTIMALKAN */
     .amount {
         font-size: 1.6rem;
         line-height: 1;
@@ -1059,19 +1118,86 @@ h1 {
         max-width: calc(100% - 40px);
         align-self: center;
         text-align: center;
+        color: var(--text-color);
+        position: relative;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Gunakan efek kilau yang lebih ringan untuk mobile */
+    .amount::before {
+        content: attr(data-text);
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
         background: linear-gradient(
             90deg,
-            var(--text-color) 0%,
-            var(--text-secondary) 45%,
-            var(--accent-color) 50%,
-            var(--text-secondary) 55%,
-            var(--text-color) 100%
+            transparent 0%,
+            var(--accent-color) 25%,
+            var(--accent-color) 35%,
+            transparent 45%
         );
-        background-size: 200% 100%;
         -webkit-background-clip: text;
         background-clip: text;
         -webkit-text-fill-color: transparent;
-        animation: shimmer-left-to-right 3s infinite linear;
+        background-size: 300% 100%;
+        animation: shimmer-mobile 4s infinite linear;
+        opacity: 0.7;
+        z-index: 1;
+        pointer-events: none;
+    }
+    
+    .amount::after {
+        content: attr(data-text);
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        color: var(--text-color);
+        z-index: 0;
+    }
+    
+    /* Animasi yang lebih lambat dan smooth untuk mobile */
+    @keyframes shimmer-mobile {
+        0% {
+            background-position: -300% 0;
+        }
+        100% {
+            background-position: 300% 0;
+        }
+    }
+    
+    /* Alternatif efek kilau yang sangat ringan untuk device lemah */
+    .amount.light-shimmer {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .amount.light-shimmer::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.3),
+            transparent
+        );
+        animation: light-shimmer 2s infinite;
+    }
+    
+    @keyframes light-shimmer {
+        0% {
+            left: -100%;
+        }
+        100% {
+            left: 200%;
+        }
     }
     
     .amount.error {
