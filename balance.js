@@ -1,22 +1,23 @@
 // ==================== KONFIGURASI ====================
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbLFk69seIMkTsx5xGSLyOHM4Iou1uTQMNNpTnwSoWX5Yu2JBgs71Lbd9OH2Xdgq6GKR0_OiTo9shV/pub?gid=236846195&range=A100:A100&single=true&output=csv";
-const STORAGE_KEY = 'kas_rt02_rw18_saldo_data';
-const UPDATE_INTERVAL = 300000; // 5 menit dalam milidetik
+const UPDATE_INTERVAL = 300000; // 5 menit
 
 // ==================== VARIABEL GLOBAL ====================
 let currentSaldo = null;
+let lastUpdateTime = null;
+let lastFetchTime = 0;
 let isUpdating = false;
 let updateTimer = null;
 
 // ==================== FUNGSI UTAMA ====================
 
 /**
- * Mengambil data saldo dari Google Sheets
+ * Mengambil data langsung dari Google Sheets
  * @returns {Promise<number|null>} Nilai saldo atau null jika gagal
  */
-async function fetchSaldoFromSheet() {
+async function fetchSaldoDirect() {
     try {
-        console.log("📡 Mengambil data saldo dari Google Sheets...");
+        console.log("📡 Mengambil data langsung dari Google Sheets...");
         
         const timestamp = new Date().getTime();
         const response = await fetch(`${SHEET_URL}&_=${timestamp}`, {
@@ -34,15 +35,7 @@ async function fetchSaldoFromSheet() {
         const text = await response.text();
         console.log("✅ Data mentah diterima:", text);
         
-        // Proses data mentah menjadi angka
-        const saldo = processSaldoData(text);
-        
-        if (saldo !== null) {
-            console.log(`💰 Saldo berhasil diproses: ${saldo}`);
-            return saldo;
-        } else {
-            throw new Error('Gagal memproses data saldo');
-        }
+        return processSaldoData(text);
         
     } catch (error) {
         console.error("❌ Error mengambil data:", error.message);
@@ -51,38 +44,36 @@ async function fetchSaldoFromSheet() {
 }
 
 /**
- * Memproses data mentah dari sheet menjadi angka
- * @param {string} rawData - Data mentah dari sheet
- * @returns {number|null} Nilai saldo yang sudah diproses
+ * Memproses data menjadi angka
+ * @param {string} rawData - Data mentah
+ * @returns {number|null} Nilai saldo
  */
 function processSaldoData(rawData) {
     if (!rawData || rawData.trim() === '') {
-        console.warn("⚠️ Data kosong dari sheet");
+        console.warn("⚠️ Data kosong");
         return null;
     }
     
     let cleaned = rawData.trim();
     
-    // Hapus karakter non-numerik kecuali titik, koma, dan minus
-    // Format 1: Rp 1.234.567
+    // Format: Rp 1.234.567
     if (cleaned.toLowerCase().includes('rp')) {
         cleaned = cleaned.replace(/rp\s*/i, '');
     }
     
-    // Hapus semua titik (pemisah ribuan)
+    // Hapus titik (ribuan separator)
     cleaned = cleaned.replace(/\./g, '');
     
-    // Ganti koma dengan titik untuk desimal (format Indonesia)
+    // Ganti koma dengan titik untuk desimal
     cleaned = cleaned.replace(',', '.');
     
-    // Hapus karakter non-numerik selain minus dan titik desimal
+    // Hapus karakter non-numerik
     cleaned = cleaned.replace(/[^\d.-]/g, '');
     
-    // Konversi ke number
     const numericValue = parseFloat(cleaned);
     
     if (isNaN(numericValue)) {
-        console.error("❌ Tidak dapat mengkonversi ke angka:", cleaned);
+        console.error("❌ Tidak dapat mengkonversi:", cleaned);
         return null;
     }
     
@@ -90,245 +81,139 @@ function processSaldoData(rawData) {
 }
 
 /**
- * Menyimpan saldo ke localStorage
- * @param {number} saldo - Nilai saldo yang akan disimpan
+ * Mendapatkan saldo dengan cache memory (hanya untuk sesi browser saat ini)
+ * @returns {Promise<number|null>} Nilai saldo
  */
-function saveSaldoToStorage(saldo) {
-    try {
-        const saldoData = {
-            value: saldo,
-            timestamp: new Date().toISOString(),
-            lastUpdated: Date.now()
-        };
-        
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(saldoData));
-        console.log(`💾 Saldo disimpan: ${saldo} pada ${saldoData.timestamp}`);
-        
-        // Update variabel global
-        currentSaldo = saldo;
-        
-        // Dispatch event untuk memberi tahu script.js bahwa ada data baru
-        const event = new CustomEvent('saldoUpdated', { 
-            detail: { saldo: saldo, timestamp: saldoData.timestamp } 
-        });
-        window.dispatchEvent(event);
-        
-        return true;
-    } catch (error) {
-        console.error("❌ Error menyimpan ke localStorage:", error);
-        return false;
-    }
-}
-
-/**
- * Mengambil saldo dari localStorage
- * @returns {object|null} Data saldo yang tersimpan
- */
-function getSaldoFromStorage() {
-    try {
-        const data = localStorage.getItem(STORAGE_KEY);
-        if (!data) return null;
-        
-        const saldoData = JSON.parse(data);
-        
-        // Validasi data
-        if (typeof saldoData.value !== 'number' || 
-            !saldoData.timestamp || 
-            !saldoData.lastUpdated) {
-            console.warn("⚠️ Data di localStorage tidak valid");
-            return null;
-        }
-        
-        return saldoData;
-    } catch (error) {
-        console.error("❌ Error membaca dari localStorage:", error);
-        return null;
-    }
-}
-
-/**
- * Memperbarui saldo dari Google Sheets dan menyimpannya
- */
-async function updateSaldo() {
-    if (isUpdating) {
-        console.log("⏳ Update sedang berjalan, tunggu...");
-        return;
+async function getSaldo() {
+    const now = Date.now();
+    const cacheAge = now - lastFetchTime;
+    
+    // Cache selama 1 menit di memory browser
+    if (currentSaldo !== null && cacheAge < 60000 && !isUpdating) {
+        console.log(`📊 Menggunakan cache memory (${Math.floor(cacheAge/1000)} detik lalu)`);
+        return currentSaldo;
     }
     
-    isUpdating = true;
-    console.log("🔄 Memulai proses update saldo...");
+    // Ambil data baru
+    console.log("🔄 Ambil data baru dari Google Sheets...");
+    const newSaldo = await fetchSaldoDirect();
     
-    try {
-        const newSaldo = await fetchSaldoFromSheet();
+    if (newSaldo !== null) {
+        currentSaldo = newSaldo;
+        lastFetchTime = now;
+        lastUpdateTime = new Date().toISOString();
         
-        if (newSaldo !== null) {
-            const storedData = getSaldoFromStorage();
-            
-            // Cek apakah ada perubahan nilai
-            if (!storedData || storedData.value !== newSaldo) {
-                console.log(`🔄 Nilai berubah dari ${storedData ? storedData.value : 'null'} ke ${newSaldo}`);
-                saveSaldoToStorage(newSaldo);
-            } else {
-                console.log("✅ Nilai tidak berubah, tidak perlu update");
-                // Tetap update timestamp untuk menandakan data masih fresh
-                saveSaldoToStorage(newSaldo);
-            }
-        } else {
-            console.warn("⚠️ Gagal mendapatkan saldo baru, tetap gunakan data lama");
-        }
-    } catch (error) {
-        console.error("❌ Error dalam proses update:", error);
-    } finally {
-        isUpdating = false;
-        console.log("✅ Proses update selesai");
-    }
-}
-
-/**
- * Mendapatkan URL untuk diakses oleh script.js
- * @returns {string} URL dengan data terbaru
- */
-function getSaldoDataURL() {
-    const storedData = getSaldoFromStorage();
-    
-    if (storedData) {
-        // Format data sebagai CSV sederhana
-        const csvData = storedData.value.toString();
-        const blob = new Blob([csvData], { type: 'text/csv' });
-        const url = URL.createObjectURL(blob);
-        
-        // Clean up URL sebelumnya jika ada
-        if (window.previousSaldoURL) {
-            URL.revokeObjectURL(window.previousSaldoURL);
-        }
-        
-        window.previousSaldoURL = url;
-        return url;
+        // Kirim event update ke script.js
+        dispatchSaldoUpdate(newSaldo);
     }
     
-    // Fallback ke Google Sheets jika tidak ada data di localStorage
-    console.warn("⚠️ Tidak ada data di localStorage, menggunakan Google Sheets langsung");
-    return SHEET_URL;
-}
-
-/**
- * Mendapatkan saldo terkini
- * @returns {number|null} Nilai saldo saat ini
- */
-function getCurrentSaldo() {
     return currentSaldo;
 }
 
 /**
- * Mendapatkan timestamp terakhir update
- * @returns {string|null} Timestamp
+ * Mengirim event ke script.js
+ * @param {number} saldo - Nilai saldo
  */
-function getLastUpdateTime() {
-    const data = getSaldoFromStorage();
-    return data ? data.timestamp : null;
+function dispatchSaldoUpdate(saldo) {
+    const event = new CustomEvent('saldoUpdated', {
+        detail: {
+            saldo: saldo,
+            timestamp: lastUpdateTime,
+            source: 'Google Sheets'
+        }
+    });
+    window.dispatchEvent(event);
+    console.log(`📢 Event saldoUpdated dikirim: ${saldo}`);
 }
 
-// ==================== INISIALISASI ====================
+/**
+ * Membuat URL data untuk script.js
+ * @returns {string} URL data
+ */
+function getDataURL() {
+    // Untuk GitHub Pages, kita selalu return URL Google Sheets langsung
+    // Script.js akan fetch dari URL ini
+    return SHEET_URL;
+}
 
 /**
- * Inisialisasi sistem penyimpanan saldo
+ * Memperbarui data secara periodik
  */
-async function initBalanceSystem() {
-    console.log("🚀 Inisialisasi sistem penyimpanan saldo...");
+async function updatePeriodically() {
+    if (isUpdating) return;
     
-    // Muat data dari localStorage jika ada
-    const storedData = getSaldoFromStorage();
-    if (storedData) {
-        currentSaldo = storedData.value;
-        console.log(`📂 Data ditemukan di localStorage: ${currentSaldo} (${storedData.timestamp})`);
+    isUpdating = true;
+    try {
+        await getSaldo();
+    } catch (error) {
+        console.error("❌ Error update periodik:", error);
+    } finally {
+        isUpdating = false;
     }
+}
+
+/**
+ * Inisialisasi sistem
+ */
+async function init() {
+    console.log("🚀 Sistem Balance untuk GitHub Pages dimulai...");
     
-    // Lakukan update pertama
-    await updateSaldo();
+    // Load pertama kali
+    await getSaldo();
     
-    // Setup auto-update setiap 5 menit
+    // Setup auto-update
     if (updateTimer) {
         clearInterval(updateTimer);
     }
     
-    updateTimer = setInterval(updateSaldo, UPDATE_INTERVAL);
+    updateTimer = setInterval(updatePeriodically, UPDATE_INTERVAL);
     console.log(`⏰ Auto-update diatur setiap ${UPDATE_INTERVAL / 60000} menit`);
     
-    // Setup auto-update saat tab/window aktif kembali
+    // Update saat tab aktif kembali
     document.addEventListener('visibilitychange', () => {
         if (!document.hidden) {
             console.log("👁️ Tab aktif, cek update...");
-            updateSaldo();
+            updatePeriodically();
         }
     });
     
-    // Setup online/offline detection
+    // Update saat online kembali
     window.addEventListener('online', () => {
         console.log("🌐 Koneksi online, cek update...");
-        updateSaldo();
+        updatePeriodically();
     });
     
-    console.log("✅ Sistem penyimpanan saldo siap!");
+    console.log("✅ Sistem Balance siap!");
 }
 
-/**
- * Membersihkan resources
- */
-function cleanup() {
-    if (updateTimer) {
-        clearInterval(updateTimer);
-        updateTimer = null;
-    }
-    
-    if (window.previousSaldoURL) {
-        URL.revokeObjectURL(window.previousSaldoURL);
-        window.previousSaldoURL = null;
-    }
-    
-    console.log("🧹 Resources dibersihkan");
-}
-
-// ==================== EKSPOR FUNGSI UNTUK GLOBAL ACCESS ====================
+// ==================== EKSPOR FUNGSI ====================
 window.BalanceSystem = {
-    init: initBalanceSystem,
-    update: updateSaldo,
-    getCurrentSaldo: getCurrentSaldo,
-    getLastUpdateTime: getLastUpdateTime,
-    getDataURL: getSaldoDataURL,
-    cleanup: cleanup,
+    init: init,
+    refresh: updatePeriodically,
+    getCurrentSaldo: () => currentSaldo,
+    getLastUpdateTime: () => lastUpdateTime,
+    getDataURL: getDataURL,
     
-    // Fungsi debug
+    // Debug functions
     debug: function() {
-        const stored = getSaldoFromStorage();
         return {
             currentSaldo: currentSaldo,
-            storedData: stored,
+            lastUpdateTime: lastUpdateTime,
+            lastFetchTime: new Date(lastFetchTime).toISOString(),
             isUpdating: isUpdating,
-            storageKey: STORAGE_KEY
+            cacheAge: Date.now() - lastFetchTime
         };
     },
     
-    // Fungsi testing
-    testUpdate: function(testValue) {
-        console.log("🧪 Testing dengan nilai:", testValue);
-        saveSaldoToStorage(testValue);
-    },
-    
-    // Fungsi untuk manual refresh
+    // Force refresh
     forceRefresh: function() {
-        console.log("🔧 Manual refresh dipanggil");
-        updateSaldo();
+        console.log("🔧 Manual refresh dipaksa");
+        lastFetchTime = 0; // Reset cache
+        updatePeriodically();
     }
 };
 
-// Auto-init ketika halaman dimuat
+// Auto-init
 document.addEventListener('DOMContentLoaded', function() {
-    // Tunggu sebentar untuk memastikan script.js sudah siap
-    setTimeout(() => {
-        initBalanceSystem();
-    }, 1000);
+    setTimeout(init, 500);
 });
-
-// Cleanup ketika window/tab ditutup
-window.addEventListener('beforeunload', cleanup);
-window.addEventListener('pagehide', cleanup);
