@@ -293,12 +293,12 @@ h1 {
     overflow-x: auto;
     overflow-y: hidden;
     position: relative;
-    /* PERBAIKAN 1: Efek kilau dari kiri ke kanan untuk seluruh view */
+    /* PERBAIKAN 5: Efek kilau dari kiri ke kanan untuk seluruh view */
     background: linear-gradient(
         90deg,
         #1e293b 0%,
         #475569 45%,
-        #a5b4fc 50%, /* Warna kilau lebih terang */
+        #a5b4fc 50%,
         #475569 55%,
         #1e293b 100%
     );
@@ -309,13 +309,13 @@ h1 {
     animation: shimmer-left-to-right 3s infinite linear;
 }
 
-/* PERBAIKAN 1: Keyframe animasi kilau dari kiri ke kanan */
+/* PERBAIKAN 5: Keyframe animasi kilau dari kiri ke kanan (dari kiri → kanan) */
 @keyframes shimmer-left-to-right {
     0% {
-        background-position: -200% 0; /* Mulai dari kiri */
+        background-position: 0% 0;     /* mulai dari kiri */
     }
     100% {
-        background-position: 200% 0; /* Berakhir di kanan */
+        background-position: 200% 0;   /* bergerak ke kanan */
     }
 }
 
@@ -398,15 +398,6 @@ h1 {
     pointer-events: none;
     opacity: 0.3;
     animation: shine 3s infinite linear;
-}
-
-@keyframes shine {
-    0% {
-        transform: translateX(-100%);
-    }
-    100% {
-        transform: translateX(100%);
-    }
 }
 
 .time-label {
@@ -660,24 +651,19 @@ h1 {
 @media (max-width: 480px) {
     body {
         padding: 15px 10px;
-        /* PERBAIKAN 2: Posisi Y axis lebih tengah */
         justify-content: center;
         align-items: center;
         min-height: 100vh;
         display: flex;
         overflow-y: auto;
-        /* Tambahkan untuk memastikan posisi tengah */
-        transform: translateY(0);
     }
     
     .background-3d {
-        justify-content: center;
+        justify-content: flex-start;
         align-items: center;
         display: flex;
         flex-direction: column;
         padding: 10px;
-        /* PERBAIKAN 2: Pastikan background di tengah */
-        transform: translateY(0);
     }
     
     .floating-shapes {
@@ -691,11 +677,10 @@ h1 {
         display: flex;
         flex-direction: column;
         align-items: center;
+        /* PERBAIKAN 2: centering vertikal di phone */
         justify-content: center;
         gap: 12px;
         padding: 0;
-        /* PERBAIKAN 2: Pastikan container di tengah */
-        transform: translateY(0);
     }
     
     .card-3d {
@@ -706,8 +691,6 @@ h1 {
         min-height: auto;
         box-sizing: border-box;
         border-radius: 20px;
-        /* PERBAIKAN 2: Pastikan card di tengah */
-        transform: translateY(0);
     }
     
     /* PERBAIKAN 1: Header mobile */
@@ -789,30 +772,6 @@ h1 {
         max-width: calc(100% - 40px);
         align-self: center;
         text-align: center; /* Center text */
-        /* PERBAIKAN 1: Efek kilau dari kiri ke kanan untuk mobile */
-        background: linear-gradient(
-            90deg,
-            #1e293b 0%,
-            #475569 45%,
-            #a5b4fc 50%, /* Warna kilau lebih terang */
-            #475569 55%,
-            #1e293b 100%
-        );
-        background-size: 200% 100%;
-        -webkit-background-clip: text;
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
-        animation: shimmer-left-to-right-mobile 3s infinite linear;
-    }
-    
-    /* PERBAIKAN 1: Keyframe animasi kilau dari kiri ke kanan untuk mobile */
-    @keyframes shimmer-left-to-right-mobile {
-        0% {
-            background-position: -200% 0; /* Mulai dari kiri */
-        }
-        100% {
-            background-position: 200% 0; /* Berakhir di kanan */
-        }
     }
     
     .amount.error {
@@ -1160,22 +1119,17 @@ h1 {
 @media (max-width: 480px) and (orientation: landscape) {
     body {
         padding: 10px;
-        /* PERBAIKAN 2: Posisi Y axis lebih tengah di landscape */
-        justify-content: center;
-        align-items: center;
-        transform: translateY(0);
+        justify-content: flex-start;
     }
     
     .app-container {
-        margin-top: 0;
-        transform: translateY(0);
+        margin-top: 5px;
     }
     
     .card-3d {
         padding: 12px;
         max-height: 95vh;
         overflow-y: auto;
-        transform: translateY(0);
     }
     
     .saldo-display {
@@ -1213,16 +1167,8 @@ h1 {
 
 /* Perangkat dengan layar sangat kecil - Disesuaikan dengan layout baru */
 @media (max-width: 360px) {
-    body {
-        /* PERBAIKAN 2: Posisi Y axis lebih tengah di layar sangat kecil */
-        justify-content: center;
-        align-items: center;
-        transform: translateY(0);
-    }
-    
     .card-3d {
         padding: 12px;
-        transform: translateY(0);
     }
     
     h1 {
