@@ -1,27 +1,13 @@
-/* ==================== RESET & VARIABLES ==================== */
+/* ==================== KONFIGURASI DASAR ==================== */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-:root {
-    /* Default Theme Variables (akan di-override oleh JavaScript) */
-    --theme-gradient-start: #667eea;
-    --theme-gradient-end: #764ba2;
-    --theme-primary: #667eea;
-    --theme-primary-light: rgba(102, 126, 234, 0.3);
-    --theme-shimmer-mid: #a5b4fc;
-    --theme-icon-shadow: rgba(102, 126, 234, 0.3);
-    
-    /* Transition untuk smooth color change */
-    --transition-speed: 0.6s;
-}
-
-/* ==================== BODY & BACKGROUND ==================== */
 body {
     font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, var(--theme-gradient-start) 0%, var(--theme-gradient-end) 100%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -29,8 +15,97 @@ body {
     align-items: center;
     overflow-x: hidden;
     padding: 20px;
-    transition: background var(--transition-speed) ease;
+    /* Transisi halus untuk perubahan background */
+    transition: background 0.5s ease-in-out;
 }
+
+/* ==================== TEMA WARNA BERDASARKAN SALDO ==================== */
+
+/* Tema Merah (saldo < 500.000) */
+body.red-theme {
+    --primary-color: #ef4444;
+    --secondary-color: #dc2626;
+    --accent-color: #f87171;
+    --bg-gradient-start: #ef4444;
+    --bg-gradient-end: #b91c1c;
+    background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+}
+
+/* Tema Oranye (500.000 <= saldo < 1.000.000) */
+body.orange-theme {
+    --primary-color: #f97316;
+    --secondary-color: #ea580c;
+    --accent-color: #fb923c;
+    --bg-gradient-start: #f97316;
+    --bg-gradient-end: #c2410c;
+    background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+}
+
+/* Tema Teal (saldo >= 1.000.000) */
+body.teal-theme {
+    --primary-color: #14b8a6;
+    --secondary-color: #0d9488;
+    --accent-color: #5eead4;
+    --bg-gradient-start: #14b8a6;
+    --bg-gradient-end: #0f766e;
+    background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+}
+
+/* Terapkan warna tema ke elemen-elemen UI */
+body.red-theme .logo i,
+body.orange-theme .logo i,
+body.teal-theme .logo i {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+body.red-theme .card-3d::before,
+body.orange-theme .card-3d::before,
+body.teal-theme .card-3d::before {
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+}
+
+body.red-theme .stat-icon,
+body.orange-theme .stat-icon,
+body.teal-theme .stat-icon {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+body.red-theme .currency,
+body.orange-theme .currency,
+body.teal-theme .currency {
+    color: var(--primary-color);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+body.red-theme .amount,
+body.orange-theme .amount,
+body.teal-theme .amount {
+    background: linear-gradient(
+        90deg,
+        var(--secondary-color) 0%,
+        var(--primary-color) 45%,
+        var(--accent-color) 50%,
+        var(--primary-color) 55%,
+        var(--secondary-color) 100%
+    );
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer-left-to-right 3s infinite linear;
+}
+
+body.red-theme .loading-dots-container span,
+body.orange-theme .loading-dots-container span,
+body.teal-theme .loading-dots-container span {
+    background: var(--primary-color);
+}
+
+/* ==================== KOMPONEN UI ==================== */
 
 .background-3d {
     position: fixed;
@@ -46,7 +121,6 @@ body {
     align-items: center;
 }
 
-/* ==================== FLOATING SHAPES ==================== */
 .floating-shapes {
     position: absolute;
     width: 100%;
@@ -96,7 +170,6 @@ body {
     }
 }
 
-/* ==================== CONTAINER & CARD ==================== */
 .app-container {
     width: 100%;
     max-width: 500px;
@@ -132,9 +205,8 @@ body {
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, var(--theme-gradient-start), var(--theme-gradient-end));
+    background: linear-gradient(90deg, #667eea, #764ba2); /* Warna default, akan ditimpa tema */
     border-radius: 24px 24px 0 0;
-    transition: background var(--transition-speed) ease;
 }
 
 @keyframes cardEntrance {
@@ -148,23 +220,6 @@ body {
     }
 }
 
-/* ==================== THEME BADGE ==================== */
-.theme-badge {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    padding: 6px 12px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    background: rgba(255, 255, 255, 0.9);
-    color: var(--theme-primary);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    transition: all var(--transition-speed) ease;
-    z-index: 10;
-}
-
-/* ==================== HEADER ==================== */
 .card-header {
     display: flex;
     justify-content: space-between;
@@ -182,12 +237,11 @@ body {
 
 .logo i {
     font-size: 2rem;
-    color: var(--theme-primary);
-    background: linear-gradient(135deg, var(--theme-gradient-start), var(--theme-gradient-end));
+    color: #667eea; /* Warna default, akan ditimpa tema */
+    background: linear-gradient(135deg, #667eea, #764ba2); /* Warna default, akan ditimpa tema */
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 2px 4px var(--theme-primary-light));
-    transition: all var(--transition-speed) ease;
+    filter: drop-shadow(0 2px 4px rgba(102, 126, 234, 0.3));
 }
 
 h1 {
@@ -198,7 +252,6 @@ h1 {
     text-align: left;
 }
 
-/* ==================== CONNECTION SIGNAL ==================== */
 .connection-signal {
     display: flex;
     align-items: center;
@@ -242,7 +295,6 @@ h1 {
     background: #ef4444;
 }
 
-/* ==================== INFO CARD ==================== */
 .info-card-3d {
     background: linear-gradient(135deg, #f8fafc, #f1f5f9);
     border-radius: 18px;
@@ -289,12 +341,10 @@ h1 {
 }
 
 .card-label i {
-    color: var(--theme-primary);
+    color: #667eea;
     font-size: 1rem;
-    transition: color var(--transition-speed) ease;
 }
 
-/* ==================== SALDO DISPLAY ==================== */
 .saldo-display {
     display: flex;
     align-items: baseline;
@@ -310,10 +360,9 @@ h1 {
 .currency {
     font-size: 1.8rem;
     font-weight: 700;
-    color: var(--theme-primary);
-    text-shadow: 0 2px 4px var(--theme-primary-light);
+    color: #667eea; /* Warna default, akan ditimpa tema */
+    text-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
     line-height: 1;
-    transition: all var(--transition-speed) ease;
 }
 
 .amount {
@@ -330,11 +379,12 @@ h1 {
     overflow-x: auto;
     overflow-y: hidden;
     position: relative;
+    /* Efek kilau default, akan ditimpa tema */
     background: linear-gradient(
         90deg,
         #1e293b 0%,
         #475569 45%,
-        var(--theme-shimmer-mid) 50%,
+        #a5b4fc 50%,
         #475569 55%,
         #1e293b 100%
     );
@@ -343,7 +393,6 @@ h1 {
     background-clip: text;
     -webkit-text-fill-color: transparent;
     animation: shimmer-left-to-right 3s infinite linear;
-    transition: background var(--transition-speed) ease;
 }
 
 @keyframes shimmer-left-to-right {
@@ -380,53 +429,6 @@ h1 {
     20%, 40%, 60%, 80% { transform: translateX(5px); }
 }
 
-/* ==================== CONNECTION STATUS ==================== */
-.connection-status {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    margin-top: 10px;
-    font-size: 0.75rem;
-    color: #64748b;
-    opacity: 0.8;
-    text-align: center;
-    line-height: 1.2;
-}
-
-.connection-status i {
-    font-size: 0.65rem;
-    line-height: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    vertical-align: middle;
-    position: relative;
-    top: 0;
-}
-
-.connection-status span {
-    line-height: 1.2;
-    display: inline-flex;
-    align-items: center;
-    vertical-align: middle;
-}
-
-.connection-status.online i {
-    color: #10b981;
-}
-
-.connection-status.offline i {
-    color: #ef4444;
-    animation: blink 1s infinite;
-}
-
-@keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-}
-
-/* ==================== TIME CARD ==================== */
 .time-card-3d {
     background: linear-gradient(145deg, #f0f0f0, #e0e0e0);
     color: #1f2937;
@@ -517,7 +519,6 @@ h1 {
         0 0 15px rgba(255, 255, 255, 0.4);
 }
 
-/* ==================== STATS ==================== */
 .stats {
     display: flex;
     justify-content: space-around;
@@ -542,16 +543,15 @@ h1 {
 .stat-icon {
     width: 35px;
     height: 35px;
-    background: linear-gradient(135deg, var(--theme-gradient-start), var(--theme-gradient-end));
+    background: linear-gradient(135deg, #667eea, #764ba2); /* Warna default, akan ditimpa tema */
     border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     font-size: 0.9rem;
-    box-shadow: 0 4px 8px var(--theme-icon-shadow);
+    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
     flex-shrink: 0;
-    transition: all var(--transition-speed) ease;
 }
 
 .stat-info {
@@ -585,7 +585,6 @@ h1 {
     align-self: center;
 }
 
-/* ==================== FOOTER ==================== */
 .footer-3d {
     text-align: center;
     color: #64748b;
@@ -620,27 +619,6 @@ h1 {
     font-weight: 500;
 }
 
-/* ==================== LOADING DOTS ==================== */
-.loading-dots {
-    display: inline-flex;
-    gap: 3px;
-}
-
-.loading-dots span {
-    animation: dotPulse 1.5s infinite ease-in-out;
-    opacity: 0;
-    font-size: 1rem;
-}
-
-.loading-dots span:nth-child(1) { animation-delay: 0s; }
-.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
-.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
-
-@keyframes dotPulse {
-    0%, 100% { opacity: 0; }
-    50% { opacity: 1; }
-}
-
 .loading-dots-container {
     display: inline-flex;
     align-items: center;
@@ -654,20 +632,13 @@ h1 {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: var(--theme-primary);
+    background: #667eea; /* Warna default, akan ditimpa tema */
     animation: dotBounce 1.4s infinite ease-in-out both;
-    transition: background var(--transition-speed) ease;
 }
 
-.loading-dots-container span:nth-child(1) { 
-    animation-delay: -0.32s; 
-}
-.loading-dots-container span:nth-child(2) { 
-    animation-delay: -0.16s; 
-}
-.loading-dots-container span:nth-child(3) { 
-    animation-delay: 0s; 
-}
+.loading-dots-container span:nth-child(1) { animation-delay: -0.32s; }
+.loading-dots-container span:nth-child(2) { animation-delay: -0.16s; }
+.loading-dots-container span:nth-child(3) { animation-delay: 0s; }
 
 @keyframes dotBounce {
     0%, 80%, 100% { 
@@ -680,7 +651,53 @@ h1 {
     }
 }
 
+.connection-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 10px;
+    font-size: 0.75rem;
+    color: #64748b;
+    opacity: 0.8;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.connection-status i {
+    font-size: 0.65rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    position: relative;
+    top: 0;
+}
+
+.connection-status span {
+    line-height: 1.2;
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+}
+
+.connection-status.online i {
+    color: #10b981;
+}
+
+.connection-status.offline i {
+    color: #ef4444;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
 /* ==================== RESPONSIVE DESIGN ==================== */
+
 @media (max-width: 480px) {
     body {
         padding: 15px 10px;
@@ -758,11 +775,100 @@ h1 {
         margin-left: 0;
     }
     
-    .theme-badge {
-        top: 10px;
-        right: 10px;
+    .info-card-3d {
+        padding: 15px;
+        margin-bottom: 12px;
+        border-radius: 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .card-label {
+        font-size: 0.85rem;
+        margin-bottom: 10px;
+        justify-content: center;
+        width: 100%;
+    }
+    
+    .saldo-display {
+        flex-direction: row;
+        gap: 6px;
+        margin-bottom: 10px;
+        min-height: 40px;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+    }
+    
+    .currency {
+        font-size: 1.5rem;
+        align-self: center;
+    }
+    
+    .amount {
+        font-size: 1.6rem;
+        line-height: 1;
+        padding: 0;
+        white-space: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        text-overflow: ellipsis;
+        max-width: calc(100% - 40px);
+        align-self: center;
+        text-align: center;
+    }
+    
+    .amount.error {
+        font-size: 0.9rem;
+        white-space: normal;
+        text-align: center;
+    }
+    
+    .amount.empty {
+        font-size: 0.9rem;
+        white-space: normal;
+        text-align: center;
+    }
+    
+    .connection-status {
         font-size: 0.7rem;
-        padding: 4px 8px;
+        flex-direction: row;
+        gap: 5px;
+        margin-top: 8px;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        text-align: center;
+        width: 100%;
+    }
+    
+    .time-card-3d {
+        padding: 12px;
+        margin-bottom: 12px;
+        border-radius: 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .time-label {
+        font-size: 0.8rem;
+        margin-bottom: 6px;
+        justify-content: center;
+        width: 100%;
+    }
+    
+    .time-display {
+        font-size: 0.85rem;
+        line-height: 1.2;
+        min-height: 20px;
+        padding: 0 5px;
+        text-align: center;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        hyphens: auto;
     }
     
     .stats {
@@ -801,17 +907,52 @@ h1 {
     .stat-divider {
         display: none;
     }
-    
-    .currency {
-        font-size: 1.5rem;
+
+    .stat-value {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #1e293b;
+        line-height: 1.2;
     }
     
-    .amount {
-        font-size: 1.6rem;
+    .stat-label {
+        font-size: 0.7rem;
+        color: #64748b;
+        font-weight: 500;
+        margin-top: 2px;
+        line-height: 1.1;
     }
     
-    .time-display {
-        font-size: 0.85rem;
+    .footer-3d {
+        font-size: 0.75rem;
+        padding: 0 5px;
+        width: 100%;
+        text-align: center;
+    }
+    
+    .footer-3d p {
+        font-size: 0.7rem;
+        text-align: center;
+        flex-direction: row;
+        gap: 5px;
+        margin-bottom: 8px;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .footer-3d p i {
+        font-size: 0.8rem;
+    }
+    
+    .connection-status i {
+        font-size: 0.6rem;
+        margin-bottom: 0;
+        flex-shrink: 0;
+    }
+    
+    .connection-status span {
+        line-height: 1.2;
+        text-align: center;
     }
     
     .watermark {
@@ -820,6 +961,292 @@ h1 {
         padding: 0 10px;
         flex-wrap: wrap;
         justify-content: center;
+        text-align: center;
+    }
+    
+    .signal-bars {
+        height: 12px;
+    }
+    
+    .signal-bar {
+        width: 2px;
+    }
+    
+    .signal-bar:nth-child(1) { height: 3px; }
+    .signal-bar:nth-child(2) { height: 5px; }
+    .signal-bar:nth-child(3) { height: 7px; }
+    .signal-bar:nth-child(4) { height: 9px; }
+    
+    @keyframes cardEntranceMobile {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .card-3d {
+        animation: cardEntranceMobile 0.8s ease-out;
+    }
+}
+
+/* Tablet kecil */
+@media (min-width: 481px) and (max-width: 767px) {
+    body {
+        padding: 20px;
+    }
+    
+    .app-container {
+        max-width: 90%;
+        margin: 0 auto;
+    }
+    
+    .card-3d {
+        max-width: 100%;
+        padding: 20px;
+    }
+    
+    .saldo-display {
+        align-items: center;
+        gap: 8px;
+        justify-content: center;
+    }
+    
+    .currency {
+        align-self: center;
+    }
+    
+    .amount {
+        align-self: center;
+        text-align: center;
+    }
+    
+    .stats {
+        padding: 12px;
+        align-items: center;
+        flex-direction: row;
+        gap: 10px;
+    }
+    
+    .stat-item {
+        justify-content: center;
+        flex-direction: row;
+        text-align: left;
+    }
+    
+    .stat-info {
+        align-items: flex-start;
+        text-align: left;
+        flex-direction: column;
+    }
+    
+    .stat-divider {
+        display: block;
+        height: 35px;
+    }
+}
+
+/* Tablet landscape */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .app-container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .card-3d {
+        max-width: 600px;
+        padding: 25px;
+    }
+    
+    .saldo-display {
+        align-items: center;
+        gap: 8px;
+        justify-content: center;
+    }
+    
+    .currency {
+        align-self: center;
+    }
+    
+    .amount {
+        align-self: center;
+        text-align: center;
+    }
+    
+    .stats {
+        padding: 15px;
+        align-items: center;
+        flex-direction: row;
+        gap: 15px;
+    }
+    
+    .stat-item {
+        justify-content: center;
+        flex-direction: row;
+        text-align: left;
+    }
+    
+    .stat-info {
+        align-items: flex-start;
+        text-align: left;
+        flex-direction: column;
+    }
+    
+    .stat-divider {
+        display: block;
+        height: 40px;
+    }
+}
+
+/* Desktop besar */
+@media (min-width: 1025px) {
+    .app-container {
+        max-width: 500px;
+    }
+    
+    .saldo-display {
+        align-items: center;
+        gap: 8px;
+        justify-content: center;
+    }
+    
+    .currency {
+        align-self: center;
+    }
+    
+    .amount {
+        align-self: center;
+        text-align: center;
+    }
+    
+    .stats {
+        align-items: center;
+        flex-direction: row;
+        gap: 15px;
+    }
+    
+    .stat-item {
+        justify-content: center;
+        flex-direction: row;
+        text-align: left;
+    }
+    
+    .stat-info {
+        align-items: flex-start;
+        text-align: left;
+        flex-direction: column;
+    }
+    
+    .stat-divider {
+        display: block;
+        height: 40px;
+    }
+}
+
+/* Mobile landscape */
+@media (max-width: 480px) and (orientation: landscape) {
+    body {
+        padding: 10px;
+        justify-content: center;
+    }
+    
+    .app-container {
+        margin-top: 5px;
+    }
+    
+    .card-3d {
+        padding: 12px;
+        max-height: 95vh;
+        overflow-y: auto;
+    }
+    
+    .saldo-display {
+        flex-direction: row;
+        gap: 6px;
+    }
+    
+    .stats {
+        flex-direction: row;
+        gap: 10px;
+        padding: 10px;
+        align-items: center;
+    }
+    
+    .stat-item {
+        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .stat-info {
+        align-items: center;
+        text-align: center;
+        flex-direction: column;
+    }
+    
+    .stat-divider {
+        display: none;
+    }
+    
+    .time-display {
+        font-size: 0.8rem;
+    }
+}
+
+/* Layar sangat kecil */
+@media (max-width: 360px) {
+    .card-3d {
+        padding: 12px;
+    }
+    
+    h1 {
+        font-size: 1.1rem;
+    }
+    
+    .saldo-display {
+        gap: 4px;
+        justify-content: center;
+    }
+    
+    .currency {
+        font-size: 1.3rem;
+    }
+    
+    .amount {
+        font-size: 1.4rem;
+        text-align: center;
+    }
+    
+    .time-display {
+        font-size: 0.75rem;
+        text-align: center;
+    }
+    
+    .stats {
+        gap: 12px;
+        padding: 10px;
+    }
+    
+    .stat-item {
+        gap: 6px;
+    }
+    
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+    
+    .stat-value {
+        font-size: 1rem;
+        text-align: center;
+    }
+    
+    .stat-label {
+        font-size: 0.8rem;
         text-align: center;
     }
 }
