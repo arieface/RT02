@@ -1,6 +1,8 @@
+[file name]: script.js
+[file content begin]
 // ==================== KONFIGURASI ====================
-// GANTI DENGAN LINK PUBLIKASI GOOGLE SHEETS ANDA
-const DATABASE_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbLFk69seIMkTsx5xGSLyOHM4Iou1uTQMNNpTnwSoWX5Yu2JBgs71Lbd9OH2Xdgq6GKR0_OiTo9shV/pub?gid=236846195&range=A100:A100&single=true&output=csv";
+// GANTI DENGAN LINK SERVER DATA KAS RT ANDA
+const SERVER_DATA_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbLFk69seIMkTsx5xGSLyOHM4Iou1uTQMNNpTnwSoWX5Yu2JBgs71Lbd9OH2Xdgq6GKR0_OiTo9shV/pub?gid=236846195&range=A100:A100&single=true&output=csv";
 
 // ==================== VARIABEL GLOBAL ====================
 let isRefreshing = false;
@@ -49,7 +51,7 @@ async function fetchSaldo() {
         const timeout = setTimeout(() => controller.abort(), 10000);
         
         const timestamp = new Date().getTime();
-        const response = await fetch(`${DATABASE_URL}&_=${timestamp}`, {
+        const response = await fetch(`${SERVER_DATA_URL}&_=${timestamp}`, {
             signal: controller.signal,
             cache: 'no-store',
             headers: {
@@ -64,7 +66,7 @@ async function fetchSaldo() {
         }
         
         const text = await response.text();
-        console.log("✅ Data diterima:", text);
+        console.log("✅ Data diterima dari server:", text);
         
         // Process data
         const processedData = processSaldoData(text);
@@ -79,17 +81,17 @@ async function fetchSaldo() {
         lastSuccessfulFetch = new Date();
         
     } catch (error) {
-        console.error("❌ Error:", error);
+        console.error("❌ Error koneksi server:", error);
         
         if (error.name === 'AbortError') {
             updateConnectionStatus('timeout');
             showError('Coba lagi - server lambat');
         } else if (!navigator.onLine) {
             updateConnectionStatus('offline');
-            showError('Offline - cek koneksi');
+            showError('Offline - cek koneksi internet');
         } else if (error.message.includes('HTTP')) {
             updateConnectionStatus('error');
-            showError('Database tidak dapat diakses');
+            showError('Server tidak dapat diakses');
         } else {
             updateConnectionStatus('offline');
             showError('Offline • Menyambungkan...');
@@ -111,14 +113,14 @@ async function fetchSaldo() {
 
 // ==================== FUNGSI PEMROSESAN DATA ====================
 function processSaldoData(rawData) {
-    console.log("🔧 Memproses data:", rawData);
+    console.log("🔧 Memproses data dari server...");
     
     // Trim dan bersihkan data
     let cleaned = rawData.trim();
     
     // Cek jika data kosong
     if (!cleaned) {
-        throw new Error('Data kosong');
+        throw new Error('Data kosong dari server');
     }
     
     // Coba berbagai format angka
@@ -141,14 +143,14 @@ function processSaldoData(rawData) {
     
     // Cek jika ada karakter non-numerik selain minus dan titik
     if (!/^-?\d*\.?\d*$/.test(cleaned)) {
-        throw new Error('Format data tidak valid');
+        throw new Error('Format data server tidak valid');
     }
     
     // Konversi ke number
     numericValue = parseFloat(cleaned);
     
     if (isNaN(numericValue)) {
-        throw new Error('Tidak dapat mengkonversi ke angka');
+        throw new Error('Tidak dapat mengkonversi data server ke angka');
     }
     
     // Format ke Rupiah
@@ -203,7 +205,7 @@ function showLoadingState() {
     }
     
     if (statusElement) {
-        statusElement.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> <span>Mengambil data terbaru...</span>';
+        statusElement.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> <span>Mengambil data terbaru dari server...</span>';
     }
 }
 
@@ -222,13 +224,13 @@ function updateConnectionStatus(status) {
         case 'online':
             signalElement.classList.add('online');
             signalText.textContent = 'Online';
-            statusElement.innerHTML = '<i class="fas fa-circle" style="color:#10b981"></i> <span>Terhubung • Data real-time</span>';
+            statusElement.innerHTML = '<i class="fas fa-circle" style="color:#10b981"></i> <span>Terhubung ke server • Data real-time</span>';
             statusElement.classList.add('online');
             break;
             
         case 'connecting':
             signalText.textContent = 'Menghubungkan...';
-            statusElement.innerHTML = '<i class="fas fa-circle" style="color:#f59e0b"></i> <span>Menyambungkan...</span>';
+            statusElement.innerHTML = '<i class="fas fa-circle" style="color:#f59e0b"></i> <span>Menyambungkan ke server...</span>';
             break;
             
         case 'timeout':
@@ -248,7 +250,7 @@ function updateConnectionStatus(status) {
         case 'error':
             signalElement.classList.add('offline');
             signalText.textContent = 'Error';
-            statusElement.innerHTML = '<i class="fas fa-circle" style="color:#ef4444"></i> <span>Offline • Menyambungkan...</span>';
+            statusElement.innerHTML = '<i class="fas fa-circle" style="color:#ef4444"></i> <span>Koneksi server terputus</span>';
             statusElement.classList.add('offline');
             break;
     }
@@ -258,20 +260,20 @@ function showError(message) {
     const saldoElement = document.getElementById('saldo');
     if (!saldoElement) return;
     
-    // Ganti "Gagal" dengan "Coba" dan "Error" dengan "Offline"
+    // Ganti pesan error
     let displayMessage = message;
     
-    if (message.includes('Gagal')) {
-        displayMessage = message.replace('Gagal', 'Coba');
+    if (message.includes('server tidak dapat diakses')) {
+        displayMessage = 'Server tidak dapat diakses';
     }
-    if (message.includes('Error')) {
-        displayMessage = message.replace('Error', 'Offline');
+    if (message.includes('koneksi server terputus')) {
+        displayMessage = 'Koneksi server terputus';
     }
-    if (message.includes('gagal')) {
-        displayMessage = message.replace('gagal', 'coba');
+    if (message.includes('server lambat')) {
+        displayMessage = 'Server lambat - coba lagi';
     }
-    if (message.includes('error')) {
-        displayMessage = message.replace('error', 'offline');
+    if (message.includes('cek koneksi server')) {
+        displayMessage = 'Cek koneksi server';
     }
     
     saldoElement.textContent = displayMessage;
@@ -326,13 +328,14 @@ function checkConnection() {
         }
     } else {
         updateConnectionStatus('offline');
-        showError('Offline - cek koneksi server');
+        showError('Offline - cek koneksi internet');
     }
 }
 
 // ==================== INISIALISASI ====================
 document.addEventListener('DOMContentLoaded', function() {
     console.log("🚀 Aplikasi Kas RT02-RW18 dimulai...");
+    console.log("🌐 Server URL:", SERVER_DATA_URL);
     
     // Set theme default
     document.body.setAttribute('data-theme', 'default');
@@ -361,7 +364,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, 300000);
     
-    // Cek koneksi secara berkala
+    // Cek koneksi server secara berkala
     setInterval(checkConnection, 30000);
 });
 
@@ -375,14 +378,14 @@ function updateStatsDisplay() {
         
         if (statValue && statLabel) {
             statValue.textContent = '24 Jam';
-            statLabel.textContent = 'Akses';
+            statLabel.textContent = 'Akses Server';
         }
     }
 }
 
 // ==================== FUNGSI DEBUG (untuk console) ====================
 window.debugFetch = function() {
-    console.log("🔧 Debug: Manual fetch");
+    console.log("🔧 Debug: Manual fetch dari server");
     fetchSaldo();
 };
 
@@ -392,7 +395,7 @@ window.debugCheckData = function() {
     console.log("Retry Count:", retryCount);
     console.log("Last Fetch:", lastSuccessfulFetch);
     console.log("Is Online:", isOnline);
-    console.log("Database URL:", DATABASE_URL);
+    console.log("Server URL:", SERVER_DATA_URL);
     console.log("Current Theme:", currentTheme);
     console.log("Last Saldo:", lastSaldo);
 };
@@ -424,15 +427,15 @@ window.testError = function(type) {
     
     switch(type) {
         case 'offline':
-            showError('Offline - cek koneksi internet');
+            showError('Offline - cek koneksi server');
             updateConnectionStatus('offline');
             break;
         case 'timeout':
-            showError('Coba lagi - server lambat');
+            showError('Server lambat - coba lagi');
             updateConnectionStatus('timeout');
             break;
         case 'error':
-            showError('Offline • mencoba menghubungkan');
+            showError('Koneksi server terputus');
             updateConnectionStatus('error');
             break;
         case 'loading':
@@ -450,3 +453,4 @@ window.testError = function(type) {
             break;
     }
 };
+[file content end]
