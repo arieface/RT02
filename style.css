@@ -1,4 +1,4 @@
-/* ==================== VARIABEL CSS THEME ==================== */
+/* ==================== VARIABEL CSS UNTUK THEME ==================== */
 :root {
     /* Default theme (purple) */
     --primary-color: #667eea;
@@ -13,11 +13,11 @@
     --text-color: #1e293b;
     --text-secondary: #64748b;
     --card-border: rgba(226, 232, 240, 0.8);
-    --transition-speed: 0.3s;
-    --transition-timing: ease-in-out;
+    --transition-speed: 0.5s;
+    --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Red Theme (Saldo < 500.000) */
+/* Red Theme (Saldo < 500.000) - DIUBAH MENJADI DARK RED/STRAWBERRY */
 [data-theme="red"] {
     --primary-color: #d32f2f;
     --secondary-color: #b71c1c;
@@ -47,11 +47,16 @@
     --success-color: #0f766e;
 }
 
-/* ==================== RESET & BASE STYLES ==================== */
+/* ==================== TRANSISI GLOBAL ==================== */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    transition: background-color var(--transition-speed) var(--transition-timing),
+                color var(--transition-speed) var(--transition-timing),
+                border-color var(--transition-speed) var(--transition-timing),
+                box-shadow var(--transition-speed) var(--transition-timing),
+                background-image var(--transition-speed) var(--transition-timing);
 }
 
 body {
@@ -59,13 +64,14 @@ body {
     background: var(--background-gradient);
     min-height: 100vh;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
+    overflow-x: hidden;
     padding: 20px;
     transition: background var(--transition-speed) var(--transition-timing);
 }
 
-/* ==================== BACKGROUND & SHAPES ==================== */
 .background-3d {
     position: fixed;
     top: 0;
@@ -73,7 +79,11 @@ body {
     width: 100%;
     height: 100%;
     z-index: -1;
-    overflow: hidden;
+    perspective: 1000px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .floating-shapes {
@@ -88,47 +98,51 @@ body {
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(5px);
-    animation: float 20s infinite ease-in-out;
+    animation: float 15s infinite ease-in-out;
     pointer-events: none;
 }
 
 .shape-1 {
-    width: 200px;
-    height: 200px;
-    top: 10%;
-    left: 5%;
+    width: 250px;
+    height: 250px;
+    top: 15%;
+    left: 10%;
     animation-delay: 0s;
 }
 
 .shape-2 {
-    width: 150px;
-    height: 150px;
-    bottom: 15%;
-    right: 10%;
+    width: 180px;
+    height: 180px;
+    bottom: 20%;
+    right: 12%;
     animation-delay: 5s;
 }
 
 .shape-3 {
-    width: 100px;
-    height: 100px;
-    top: 60%;
-    left: 80%;
+    width: 120px;
+    height: 120px;
+    top: 65%;
+    left: 85%;
     animation-delay: 10s;
 }
 
 @keyframes float {
-    0%, 100% { 
-        transform: translateY(0) rotate(0deg); 
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
     }
-    50% { 
-        transform: translateY(-20px) rotate(180deg); 
+    50% {
+        transform: translateY(-20px) rotate(180deg);
     }
 }
 
-/* ==================== MAIN CONTAINER ==================== */
+/* Container utama untuk centering */
 .app-container {
     width: 100%;
     max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
     margin: 0 auto;
 }
 
@@ -136,15 +150,18 @@ body {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
     border-radius: 24px;
-    padding: 25px;
+    padding: 20px;
     box-shadow: 
         0 20px 40px rgba(0, 0, 0, 0.15),
-        0 10px 20px rgba(0, 0, 0, 0.1),
+        0 15px 30px rgba(0, 0, 0, 0.12),
         inset 0 1px 0 rgba(255, 255, 255, 0.6);
     border: 1px solid rgba(255, 255, 255, 0.3);
+    transform-style: preserve-3d;
     animation: cardEntrance 0.8s ease-out;
     position: relative;
     overflow: hidden;
+    width: 100%;
+    max-width: 100%;
 }
 
 .card-3d::before {
@@ -156,39 +173,43 @@ body {
     height: 4px;
     background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
     border-radius: 24px 24px 0 0;
+    transition: background var(--transition-speed) var(--transition-timing);
 }
 
 @keyframes cardEntrance {
     from {
         opacity: 0;
-        transform: translateY(30px) scale(0.95);
+        transform: translateY(50px) rotateX(10deg);
     }
     to {
         opacity: 1;
-        transform: translateY(0) scale(1);
+        transform: translateY(0) rotateX(0);
     }
 }
 
-/* ==================== HEADER ==================== */
+/* Header */
 .card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
 .logo {
     display: flex;
     align-items: center;
     gap: 12px;
+    justify-content: flex-start;
+    flex: 1;
 }
 
 .logo i {
-    font-size: 2.2rem;
+    font-size: 2rem;
     color: var(--primary-color);
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 4px rgba(var(--primary-color-rgb), 0.3));
 }
 
 h1 {
@@ -196,21 +217,23 @@ h1 {
     font-size: 1.5rem;
     font-weight: 700;
     letter-spacing: -0.3px;
+    text-align: left;
 }
 
-/* ==================== CONNECTION SIGNAL ==================== */
+/* Connection signal */
 .connection-signal {
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 8px 12px;
-    border-radius: 20px;
+    padding: 6px 12px;
+    border-radius: 16px;
     font-size: 0.8rem;
     font-weight: 600;
-    background: rgba(248, 250, 252, 0.9);
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
     color: #475569;
     border: 1px solid rgba(226, 232, 240, 0.8);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    margin-left: 10px;
 }
 
 .signal-bars {
@@ -241,16 +264,17 @@ h1 {
     background: var(--danger-color);
 }
 
-/* ==================== BALANCE CARD ==================== */
+/* Info card */
 .info-card-3d {
     background: var(--card-gradient);
     border-radius: 18px;
-    padding: 20px;
-    margin-bottom: 20px;
+    padding: 18px;
+    margin-bottom: 15px;
     border: 1px solid var(--card-border);
     box-shadow: 
         0 10px 25px rgba(0, 0, 0, 0.08),
         inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    transform-style: preserve-3d;
     position: relative;
     overflow: hidden;
 }
@@ -280,7 +304,7 @@ h1 {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
     color: var(--text-secondary);
     font-size: 0.9rem;
     font-weight: 600;
@@ -288,32 +312,46 @@ h1 {
 
 .card-label i {
     color: var(--primary-color);
-    font-size: 1.1rem;
+    font-size: 1rem;
 }
 
-/* ==================== SALDO DISPLAY ==================== */
+/* Saldo display */
 .saldo-display {
     display: flex;
     align-items: baseline;
     justify-content: center;
-    gap: 10px;
-    margin-bottom: 15px;
-    min-height: 60px;
+    gap: 8px;
+    margin-bottom: 12px;
+    min-height: 50px;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    position: relative;
 }
 
 .currency {
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: 700;
     color: var(--primary-color);
+    text-shadow: 0 2px 4px rgba(var(--primary-color-rgb), 0.2);
+    line-height: 1;
 }
 
+/* Efek kilau saldo */
 .amount {
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 800;
     color: var(--text-color);
     letter-spacing: -0.5px;
+    word-break: keep-all;
+    overflow: hidden;
     text-align: center;
     line-height: 1;
+    white-space: nowrap;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    position: relative;
+    /* Efek kilau untuk seluruh view */
     background: linear-gradient(
         90deg,
         var(--text-color) 0%,
@@ -326,10 +364,13 @@ h1 {
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: shimmer 3s infinite linear;
+    animation: shimmer-left-to-right 3s infinite linear;
 }
 
-@keyframes shimmer {
+/* CATATAN: background-position bergerak berlawanan dengan arah visual
+   Untuk membuat kilau BERGERAK dari kiri ke kanan, posisi background
+   justru dianimasi dari 100% ke -100% */
+@keyframes shimmer-left-to-right {
     0% {
         background-position: 100% 0;
     }
@@ -338,55 +379,85 @@ h1 {
     }
 }
 
+/* Error & empty state */
 .amount.error {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     color: var(--warning-color);
     background: none;
     -webkit-text-fill-color: var(--warning-color);
     font-weight: 600;
+    animation: shake 0.5s ease;
+    white-space: normal;
 }
 
-/* ==================== CONNECTION STATUS ==================== */
-.connection-status {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    margin-top: 10px;
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    text-align: center;
+.amount.empty {
+    font-size: 1.1rem;
+    color: var(--warning-color);
+    background: none;
+    -webkit-text-fill-color: var(--warning-color);
+    font-weight: 600;
+    white-space: normal;
 }
 
-.connection-status i {
-    font-size: 0.7rem;
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
 }
 
-.connection-status.online i {
-    color: var(--success-color);
-}
-
-.connection-status.offline i {
-    color: var(--danger-color);
-    animation: blink 1s infinite;
-}
-
-@keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-}
-
-/* ==================== TIME CARD ==================== */
+/* Time card */
 .time-card-3d {
     background: linear-gradient(145deg, #f0f0f0, #e0e0e0);
     color: #1f2937;
     border-radius: 16px;
     padding: 15px;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     box-shadow: 
-        0 10px 20px rgba(0, 0, 0, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        0 12px 30px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8),
+        inset 0 -1px 1px rgba(0, 0, 0, 0.1),
+        0 0 0 1px rgba(220, 220, 220, 0.8);
     border: 1px solid rgba(200, 200, 200, 0.6);
+    position: relative;
+    overflow: hidden;
+}
+
+.time-card-3d::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, 
+        #c0c0c0, 
+        #f0f0f0, 
+        #ffffff,
+        #f0f0f0,
+        #c0c0c0);
+    border-radius: 16px 16px 0 0;
+    opacity: 0.9;
+    box-shadow: 
+        0 2px 15px rgba(192, 192, 192, 0.5),
+        0 0 25px rgba(255, 255, 255, 0.4);
+}
+
+.time-card-3d::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        45deg,
+        transparent 30%,
+        rgba(255, 255, 255, 0.4) 50%,
+        transparent 70%
+    );
+    pointer-events: none;
+    opacity: 0.3;
+    animation: shine 3s infinite linear;
 }
 
 .time-label {
@@ -397,56 +468,76 @@ h1 {
     color: #4b5563;
     font-size: 0.85rem;
     font-weight: 600;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
 }
 
 .time-label i {
     color: #6b7280;
+    font-size: 0.9rem;
+    text-shadow: 
+        0 1px 3px rgba(255, 255, 255, 0.8),
+        0 0 10px rgba(255, 255, 255, 0.5);
 }
 
 .time-display {
-    font-size: 0.95rem;
+    font-size: 1rem;
     font-weight: 600;
     text-align: center;
     color: #111827;
     letter-spacing: 0.5px;
-    min-height: 22px;
-    line-height: 1.4;
+    font-variant-numeric: tabular-nums;
+    min-height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.3;
+    text-shadow: 
+        0 1px 3px rgba(255, 255, 255, 0.8),
+        0 0 15px rgba(255, 255, 255, 0.4);
 }
 
-/* ==================== STATS ==================== */
+/* Stats */
 .stats {
     display: flex;
     justify-content: space-around;
     background: rgba(241, 245, 249, 0.8);
     border-radius: 14px;
     padding: 15px;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     backdrop-filter: blur(10px);
     border: 1px solid rgba(226, 232, 240, 0.5);
+    flex-wrap: nowrap;
 }
 
 .stat-item {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    min-width: auto;
+    justify-content: center;
+    flex-direction: row;
 }
 
 .stat-icon {
-    width: 40px;
-    height: 40px;
+    width: 35px;
+    height: 35px;
     background: var(--stat-icon-gradient);
     border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 1rem;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    font-size: 0.9rem;
+    box-shadow: 0 4px 8px rgba(var(--primary-color-rgb), 0.3);
+    flex-shrink: 0;
 }
 
 .stat-info {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    white-space: nowrap;
 }
 
 .stat-value {
@@ -461,23 +552,27 @@ h1 {
     color: var(--text-secondary);
     font-weight: 500;
     margin-top: 2px;
+    line-height: 1.1;
 }
 
 .stat-divider {
     width: 1px;
-    height: 40px;
+    height: 35px;
     background: rgba(203, 213, 224, 0.5);
+    margin: 0 5px;
+    align-self: center;
 }
 
-/* ==================== FOOTER ==================== */
+/* Footer */
 .footer-3d {
     text-align: center;
     color: var(--text-secondary);
     font-size: 0.85rem;
+    width: 100%;
 }
 
 .footer-3d p {
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -485,21 +580,12 @@ h1 {
     font-size: 0.8rem;
 }
 
-.footer-3d a {
-    color: var(--primary-color);
-    text-decoration: none;
-    transition: opacity 0.2s;
-}
-
-.footer-3d a:hover {
-    opacity: 0.8;
-}
-
 .footer-3d p i {
     font-size: 0.9rem;
+    vertical-align: middle;
+    line-height: 1;
 }
 
-/* ==================== WATERMARK ==================== */
 .watermark {
     text-align: center;
     margin-top: 20px;
@@ -512,29 +598,102 @@ h1 {
     font-weight: 500;
 }
 
-/* ==================== LOADING ANIMATION ==================== */
+/* Loading dots (text) */
 .loading-dots {
+    display: inline-flex;
+    gap: 3px;
+}
+
+.loading-dots span {
+    animation: dotPulse 1.5s infinite ease-in-out;
+    opacity: 0;
+    font-size: 1rem;
+}
+
+.loading-dots span:nth-child(1) { animation-delay: 0s; }
+.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes dotPulse {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
+}
+
+/* Connection status */
+.connection-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 10px;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    opacity: 0.8;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.connection-status i {
+    font-size: 0.65rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    position: relative;
+    top: 0;
+}
+
+.connection-status span {
+    line-height: 1.2;
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+}
+
+.connection-status.online i {
+    color: var(--success-color);
+}
+
+.connection-status.offline i {
+    color: var(--danger-color);
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+/* Loading dots (circle) */
+.loading-dots-container {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 4px;
-    height: 40px;
+    height: 35px;
 }
 
-.loading-dots span {
+.loading-dots-container span {
     display: inline-block;
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
     background: var(--primary-color);
-    animation: bounce 1.4s infinite ease-in-out both;
+    animation: dotBounce 1.4s infinite ease-in-out both;
 }
 
-.loading-dots span:nth-child(1) { animation-delay: -0.32s; }
-.loading-dots span:nth-child(2) { animation-delay: -0.16s; }
-.loading-dots span:nth-child(3) { animation-delay: 0s; }
+.loading-dots-container span:nth-child(1) { 
+    animation-delay: -0.32s; 
+}
+.loading-dots-container span:nth-child(2) { 
+    animation-delay: -0.16s; 
+}
+.loading-dots-container span:nth-child(3) { 
+    animation-delay: 0s; 
+}
 
-@keyframes bounce {
+@keyframes dotBounce {
     0%, 80%, 100% { 
         transform: scale(0);
         opacity: 0.5;
@@ -546,67 +705,599 @@ h1 {
 }
 
 /* ==================== RESPONSIVE DESIGN ==================== */
+
 @media (max-width: 480px) {
     body {
-        padding: 15px;
+        padding: 15px 10px;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        display: flex;
+        overflow-y: auto;
+    }
+    
+    .background-3d {
+        justify-content: center;
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+    }
+    
+    /* REVISI: Bubble/bentuk latar tidak disembunyikan di mobile */
+    .floating-shapes {
+        display: block !important; /* Pastikan tetap terlihat */
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        overflow: visible; /* Pastikan bubble tidak terpotong */
+    }
+    
+    /* REVISI: Atur posisi Y untuk bubble di mobile view */
+    .shape-1 {
+        width: 180px;
+        height: 180px;
+        top: -50px !important; /* Posisi di luar kartu */
+        left: -50px;
+        opacity: 0.6;
+        animation-delay: 0s;
+    }
+    
+    .shape-2 {
+        width: 120px;
+        height: 120px;
+        bottom: -30px !important; /* Posisi di luar kartu */
+        right: -30px;
+        opacity: 0.4;
+        animation-delay: 5s;
+    }
+    
+    .shape-3 {
+        width: 80px;
+        height: 80px;
+        top: auto !important;
+        bottom: 60% !important;
+        left: 85% !important;
+        opacity: 0.3;
+        animation-delay: 10s;
+    }
+    
+    /* REVISI: Bubble lebih kecil di mobile tapi tetap terlihat */
+    .shape {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(3px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .app-container {
+        margin: 0;
+        width: 100%;
+        max-width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 0;
     }
     
     .card-3d {
-        padding: 20px;
+        padding: 15px;
+        margin: 0;
+        width: 100%;
+        max-width: 100%;
+        min-height: auto;
+        box-sizing: border-box;
         border-radius: 20px;
     }
     
     .card-header {
         flex-direction: column;
-        gap: 15px;
+        gap: 12px;
         text-align: center;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .logo {
+        justify-content: center;
+        width: 100%;
+        flex-direction: row;
+        gap: 10px;
     }
     
     h1 {
-        font-size: 1.3rem;
+        font-size: 1.2rem;
+        text-align: center;
+        line-height: 1.3;
     }
     
     .logo i {
-        font-size: 1.8rem;
+        font-size: 1.5rem;
     }
     
     .connection-signal {
-        width: 100%;
-        justify-content: center;
+        font-size: 0.7rem;
+        padding: 5px 10px;
+        margin-top: 5px;
+        width: auto;
+        margin-left: 0;
     }
     
-    .amount {
-        font-size: 2rem;
+    .info-card-3d {
+        padding: 15px;
+        margin-bottom: 12px;
+        border-radius: 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .card-label {
+        font-size: 0.85rem;
+        margin-bottom: 10px;
+        justify-content: center;
+        width: 100%;
+    }
+    
+    .saldo-display {
+        flex-direction: row;
+        gap: 6px;
+        margin-bottom: 10px;
+        min-height: 40px;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
     }
     
     .currency {
+        font-size: 1.5rem;
+        align-self: center;
+    }
+    
+    .amount {
         font-size: 1.6rem;
+        line-height: 1;
+        padding: 0;
+        white-space: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        text-overflow: ellipsis;
+        max-width: calc(100% - 40px);
+        align-self: center;
+        text-align: center;
+    }
+    
+    .amount.error {
+        font-size: 0.9rem;
+        white-space: normal;
+        text-align: center;
+    }
+    
+    .amount.empty {
+        font-size: 0.9rem;
+        white-space: normal;
+        text-align: center;
+    }
+    
+    .connection-status {
+        font-size: 0.7rem;
+        flex-direction: row;
+        gap: 5px;
+        margin-top: 8px;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        text-align: center;
+        width: 100%;
+    }
+    
+    .time-card-3d {
+        padding: 12px;
+        margin-bottom: 12px;
+        border-radius: 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .time-label {
+        font-size: 0.8rem;
+        margin-bottom: 6px;
+        justify-content: center;
+        width: 100%;
     }
     
     .time-display {
         font-size: 0.85rem;
+        line-height: 1.2;
+        min-height: 20px;
+        padding: 0 5px;
+        text-align: center;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        hyphens: auto;
     }
     
+    /* Stats mobile: grid 2 baris (icon atas, teks bawah) */
     .stats {
-        flex-direction: column;
-        gap: 15px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: auto auto;
+        gap: 8px 15px;
+        padding: 15px;
+        margin-bottom: 12px;
+        border-radius: 12px;
+        width: 100%;
+        box-sizing: border-box;
     }
     
     .stat-item {
+        display: contents;
+    }
+    
+    .stat-icon {
+        grid-row: 1;
+        justify-self: center;
+        align-self: center;
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+    
+    .stat-info {
+        grid-row: 2;
+        text-align: center;
+        align-items: center;
         justify-content: center;
+        white-space: normal;
     }
     
     .stat-divider {
         display: none;
     }
-}
 
-@media (min-width: 768px) and (max-width: 1024px) {
-    .app-container {
-        max-width: 600px;
+    .stat-value {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--text-color);
+        line-height: 1.2;
+    }
+    
+    .stat-label {
+        font-size: 0.7rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+        margin-top: 2px;
+        line-height: 1.1;
+    }
+    
+    .footer-3d {
+        font-size: 0.75rem;
+        padding: 0 5px;
+        width: 100%;
+        text-align: center;
+    }
+    
+    .footer-3d p {
+        font-size: 0.7rem;
+        text-align: center;
+        flex-direction: row;
+        gap: 5px;
+        margin-bottom: 8px;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .footer-3d p i {
+        font-size: 0.8rem;
+    }
+    
+    .connection-status i {
+        font-size: 0.6rem;
+        margin-bottom: 0;
+        flex-shrink: 0;
+    }
+    
+    .connection-status span {
+        line-height: 1.2;
+        text-align: center;
+    }
+    
+    .watermark {
+        margin-top: 15px;
+        font-size: 0.7rem;
+        padding: 0 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+        text-align: center;
+    }
+    
+    .signal-bars {
+        height: 12px;
+    }
+    
+    .signal-bar {
+        width: 2px;
+    }
+    
+    .signal-bar:nth-child(1) { height: 3px; }
+    .signal-bar:nth-child(2) { height: 5px; }
+    .signal-bar:nth-child(3) { height: 7px; }
+    .signal-bar:nth-child(4) { height: 9px; }
+    
+    @keyframes cardEntranceMobile {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
     
     .card-3d {
-        padding: 30px;
+        animation: cardEntranceMobile 0.8s ease-out;
+    }
+}
+
+/* Tablet kecil */
+@media (min-width: 481px) and (max-width: 767px) {
+    body {
+        padding: 20px;
+    }
+    
+    .app-container {
+        max-width: 90%;
+        margin: 0 auto;
+    }
+    
+    .card-3d {
+        max-width: 100%;
+        padding: 20px;
+    }
+    
+    .saldo-display {
+        align-items: center;
+        gap: 8px;
+        justify-content: center;
+    }
+    
+    .currency {
+        align-self: center;
+    }
+    
+    .amount {
+        align-self: center;
+        text-align: center;
+    }
+    
+    .stats {
+        padding: 12px;
+        align-items: center;
+        flex-direction: row;
+        gap: 10px;
+    }
+    
+    .stat-item {
+        justify-content: center;
+        flex-direction: row;
+        text-align: left;
+    }
+    
+    .stat-info {
+        align-items: flex-start;
+        text-align: left;
+        flex-direction: column;
+    }
+    
+    .stat-divider {
+        display: block;
+        height: 35px;
+    }
+}
+
+/* Tablet landscape */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .app-container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .card-3d {
+        max-width: 600px;
+        padding: 25px;
+    }
+    
+    .saldo-display {
+        align-items: center;
+        gap: 8px;
+        justify-content: center;
+    }
+    
+    .currency {
+        align-self: center;
+    }
+    
+    .amount {
+        align-self: center;
+        text-align: center;
+    }
+    
+    .stats {
+        padding: 15px;
+        align-items: center;
+        flex-direction: row;
+        gap: 15px;
+    }
+    
+    .stat-item {
+        justify-content: center;
+        flex-direction: row;
+        text-align: left;
+    }
+    
+    .stat-info {
+        align-items: flex-start;
+        text-align: left;
+        flex-direction: column;
+    }
+    
+    .stat-divider {
+        display: block;
+        height: 40px;
+    }
+}
+
+/* Desktop besar */
+@media (min-width: 1025px) {
+    .app-container {
+        max-width: 500px;
+    }
+    
+    .saldo-display {
+        align-items: center;
+        gap: 8px;
+        justify-content: center;
+    }
+    
+    .currency {
+        align-self: center;
+    }
+    
+    .amount {
+        align-self: center;
+        text-align: center;
+    }
+    
+    .stats {
+        align-items: center;
+        flex-direction: row;
+        gap: 15px;
+    }
+    
+    .stat-item {
+        justify-content: center;
+        flex-direction: row;
+        text-align: left;
+    }
+    
+    .stat-info {
+        align-items: flex-start;
+        text-align: left;
+        flex-direction: column;
+    }
+    
+    .stat-divider {
+        display: block;
+        height: 40px;
+    }
+}
+
+/* Mobile landscape */
+@media (max-width: 480px) and (orientation: landscape) {
+    body {
+        padding: 10px;
+        justify-content: center;
+    }
+    
+    .app-container {
+        margin-top: 5px;
+    }
+    
+    .card-3d {
+        padding: 12px;
+        max-height: 95vh;
+        overflow-y: auto;
+    }
+    
+    .saldo-display {
+        flex-direction: row;
+        gap: 6px;
+    }
+    
+    .stats {
+        flex-direction: row;
+        gap: 10px;
+        padding: 10px;
+        align-items: center;
+    }
+    
+    .stat-item {
+        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .stat-info {
+        align-items: center;
+        text-align: center;
+        flex-direction: column;
+    }
+    
+    .stat-divider {
+        display: none;
+    }
+    
+    .time-display {
+        font-size: 0.8rem;
+    }
+}
+
+/* Layar sangat kecil */
+@media (max-width: 360px) {
+    .card-3d {
+        padding: 12px;
+    }
+    
+    h1 {
+        font-size: 1.1rem;
+    }
+    
+    .saldo-display {
+        gap: 4px;
+        justify-content: center;
+    }
+    
+    .currency {
+        font-size: 1.3rem;
+    }
+    
+    .amount {
+        font-size: 1.4rem;
+        text-align: center;
+    }
+    
+    .time-display {
+        font-size: 0.75rem;
+        text-align: center;
+    }
+    
+    .stats {
+        gap: 12px;
+        padding: 10px;
+    }
+    
+    .stat-item {
+        gap: 6px;
+    }
+    
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+    
+    .stat-value {
+        font-size: 1rem;
+        text-align: center;
+    }
+    
+    .stat-label {
+        font-size: 0.8rem;
+        text-align: center;
     }
 }

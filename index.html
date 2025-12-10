@@ -3,35 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>💰 Kas RT02 - RW18 | Dashboard Saldo Online</title>
-    
-    <!-- Meta Tags -->
-    <meta name="description" content="Dashboard saldo kas real-time RT02 RW18. Monitoring transparan keuangan RT.">
-    <meta name="keywords" content="kas rt, keuangan rt, saldo online, rt02 rw18, transparansi keuangan">
-    <meta name="author" content="Arief (Aace)">
-    <meta name="theme-color" content="#667eea">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💰</text></svg>">
-    
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="manifest.json">
-    
-    <!-- Stylesheets -->
+    <title>⬇️ Cek Saldo Online Kas RT02-RW18</title>
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- PWA Meta -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💰</text></svg>">
 </head>
-
 <body data-theme="default">
-    <!-- Background Animation -->
     <div class="background-3d">
         <div class="floating-shapes">
             <div class="shape shape-1"></div>
@@ -39,10 +18,8 @@
             <div class="shape shape-3"></div>
         </div>
         
-        <!-- Main App Container -->
         <div class="app-container">
             <div class="card-3d">
-                <!-- Header with Logo & Connection -->
                 <div class="card-header">
                     <div class="logo">
                         <i class="fas fa-university"></i>
@@ -60,7 +37,6 @@
                     </div>
                 </div>
                 
-                <!-- Balance Card -->
                 <div class="info-card-3d">
                     <div class="card-label">
                         <i class="fas fa-wallet"></i>
@@ -72,11 +48,10 @@
                     </div>
                     <div class="connection-status" id="connection-status">
                         <i class="fas fa-circle"></i>
-                        <span>Menyambungkan ke server...</span>
+                        <span>Menyinkronkan dengan server...</span>
                     </div>
                 </div>
                 
-                <!-- Time Card -->
                 <div class="time-card-3d">
                     <div class="time-label">
                         <i class="fas fa-clock"></i>
@@ -85,7 +60,6 @@
                     <div class="time-display" id="waktu">-</div>
                 </div>
                 
-                <!-- Stats -->
                 <div class="stats">
                     <div class="stat-item">
                         <div class="stat-icon">
@@ -122,37 +96,18 @@
                     </div>
                 </div>
                 
-                <!-- Footer -->
                 <div class="footer-3d">
-                    <p><i class="fas fa-info-circle"></i> Data auto-update via GitHub Actions</p>
-                    <p><i class="fas fa-code-branch"></i> <a href="https://github.com/arieface/RT02" target="_blank" style="color: var(--primary-color); text-decoration: none;">View on GitHub</a></p>
+                    <p><i class="fas fa-info-circle"></i> Data diperbarui otomatis setiap 5 menit</p>
                 </div>
             </div>
         </div>
         
-        <!-- Watermark -->
         <div class="watermark">
             <i class="fas fa-home"></i>
             <span> RT02 RW18 Digitaltech ~ by Arief (Aace)</span>
         </div>
     </div>
 
-    <!-- JavaScript -->
     <script src="script.js"></script>
-    
-    <!-- PWA Service Worker Registration -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('sw.js')
-                    .then(function(registration) {
-                        console.log('✅ Service Worker registered');
-                    })
-                    .catch(function(error) {
-                        console.log('❌ Service Worker registration failed:', error);
-                    });
-            });
-        }
-    </script>
 </body>
 </html>
