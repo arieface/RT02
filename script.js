@@ -1,6 +1,6 @@
 // ==================== KONFIGURASI ====================
-// GANTI DENGAN LINK PUBLIKASI GOOGLE SHEETS ANDA
-const DATABASE_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbLFk69seIMkTsx5xGSLyOHM4Iou1uTQMNNpTnwSoWX5Yu2JBgs71Lbd9OH2Xdgq6GKR0_OiTo9shV/pub?gid=236846195&range=A100:A100&single=true&output=csv";
+// AMBIL DATA DARI balance.js (akan diupdate setelah balance.js dimuat)
+let DATABASE_URL = null;
 
 // ==================== VARIABEL GLOBAL ====================
 let isRefreshing = false;
@@ -39,17 +39,27 @@ async function fetchSaldo() {
     updateConnectionStatus('connecting');
     
     try {
-        console.log("📡 Mengambil data dari server...");
+        console.log("📡 Mengambil data dari sistem penyimpanan...");
         
         // Update UI ke loading state
         showLoadingState();
+        
+        // Dapatkan URL dari BalanceSystem
+        if (!DATABASE_URL && window.BalanceSystem) {
+            DATABASE_URL = window.BalanceSystem.getDataURL();
+            console.log("🔗 URL database diatur dari balance.js");
+        }
+        
+        if (!DATABASE_URL) {
+            throw new Error('Database URL belum tersedia');
+        }
         
         // Fetch data dengan timeout
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 10000);
         
         const timestamp = new Date().getTime();
-        const response = await fetch(`${DATABASE_URL}&_=${timestamp}`, {
+        const response = await fetch(`${DATABASE_URL}?_=${timestamp}`, {
             signal: controller.signal,
             cache: 'no-store',
             headers: {
@@ -78,6 +88,14 @@ async function fetchSaldo() {
         retryCount = 0;
         lastSuccessfulFetch = new Date();
         
+        // Update statistik waktu
+        if (window.BalanceSystem) {
+            const lastUpdate = window.BalanceSystem.getLastUpdateTime();
+            if (lastUpdate) {
+                updateLastUpdateTime(lastUpdate);
+            }
+        }
+        
     } catch (error) {
         console.error("❌ Error:", error);
         
@@ -95,11 +113,29 @@ async function fetchSaldo() {
             showError('Offline • Menyambungkan...');
         }
         
-        // Retry logic
-        if (retryCount < MAX_RETRIES) {
-            retryCount++;
-            console.log(`🔄 Retry ${retryCount}/${MAX_RETRIES} dalam 3 detik...`);
-            setTimeout(fetchSaldo, 3000);
+        // Coba ambil data langsung dari BalanceSystem sebagai fallback
+        if (window.BalanceSystem && window.BalanceSystem.getCurrentSaldo()) {
+            console.log("🔄 Menggunakan data dari balance.js cache...");
+            const cachedSaldo = window.BalanceSystem.getCurrentSaldo();
+            const processedData = {
+                raw: cachedSaldo.toString(),
+                numeric: cachedSaldo,
+                formatted: new Intl.NumberFormat('id-ID', {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                }).format(cachedSaldo)
+            };
+            updateSaldoDisplay(processedData);
+            updateThemeBasedOnSaldo(processedData.numeric);
+            lastSaldo = processedData.numeric;
+            updateConnectionStatus('online');
+        } else {
+            // Retry logic
+            if (retryCount < MAX_RETRIES) {
+                retryCount++;
+                console.log(`🔄 Retry ${retryCount}/${MAX_RETRIES} dalam 3 detik...`);
+                setTimeout(fetchSaldo, 3000);
+            }
         }
         
     } finally {
@@ -314,6 +350,30 @@ function updateTime() {
     }
 }
 
+// ==================== FUNGSI UPDATE LAST UPDATE TIME ====================
+function updateLastUpdateTime(timestamp) {
+    const timeElement = document.getElementById('waktu');
+    if (!timeElement) return;
+    
+    const updateTime = new Date(timestamp);
+    const now = new Date();
+    const diffMs = now - updateTime;
+    const diffMins = Math.floor(diffMs / 60000);
+    
+    let timeAgo;
+    if (diffMins < 1) {
+        timeAgo = 'Baru saja';
+    } else if (diffMins < 60) {
+        timeAgo = `${diffMins} menit yang lalu`;
+    } else {
+        const diffHours = Math.floor(diffMins / 60);
+        timeAgo = `${diffHours} jam yang lalu`;
+    }
+    
+    // Tambahkan informasi waktu update di tooltip
+    timeElement.title = `Data diperbarui: ${updateTime.toLocaleString('id-ID')} (${timeAgo})`;
+}
+
 // ==================== FUNGSI DETEKSI KONEKSI ====================
 function checkConnection() {
     isOnline = navigator.onLine;
@@ -329,6 +389,38 @@ function checkConnection() {
         showError('Offline - cek koneksi server');
     }
 }
+
+// ==================== EVENT LISTENER UNTUK balance.js ====================
+
+// Listen untuk event ketika balance.js mengupdate data
+window.addEventListener('saldoUpdated', function(event) {
+    console.log("🎯 Event saldoUpdated diterima:", event.detail);
+    
+    // Update DATABASE_URL dengan data terbaru
+    if (window.BalanceSystem) {
+        DATABASE_URL = window.BalanceSystem.getDataURL();
+        console.log("🔄 URL database diperbarui dari balance.js");
+    }
+    
+    // Refresh tampilan saldo
+    if (event.detail && event.detail.saldo !== undefined) {
+        const processedData = {
+            raw: event.detail.saldo.toString(),
+            numeric: event.detail.saldo,
+            formatted: new Intl.NumberFormat('id-ID', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(event.detail.saldo)
+        };
+        
+        updateSaldoDisplay(processedData);
+        updateThemeBasedOnSaldo(processedData.numeric);
+        lastSaldo = processedData.numeric;
+        updateLastUpdateTime(event.detail.timestamp);
+        
+        console.log("✅ Saldo diperbarui dari event:", event.detail.saldo);
+    }
+});
 
 // ==================== INISIALISASI ====================
 document.addEventListener('DOMContentLoaded', function() {
@@ -347,8 +439,19 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('online', checkConnection);
     window.addEventListener('offline', checkConnection);
     
-    // Fetch data pertama
-    setTimeout(fetchSaldo, 500);
+    // Tunggu balance.js siap
+    const waitForBalanceSystem = setInterval(() => {
+        if (window.BalanceSystem && window.BalanceSystem.getDataURL) {
+            clearInterval(waitForBalanceSystem);
+            
+            // Dapatkan URL dari balance.js
+            DATABASE_URL = window.BalanceSystem.getDataURL();
+            console.log("🔗 URL database diatur:", DATABASE_URL);
+            
+            // Fetch data pertama
+            setTimeout(fetchSaldo, 500);
+        }
+    }, 100);
     
     // Update waktu setiap detik
     updateTime();
@@ -395,6 +498,11 @@ window.debugCheckData = function() {
     console.log("Database URL:", DATABASE_URL);
     console.log("Current Theme:", currentTheme);
     console.log("Last Saldo:", lastSaldo);
+    
+    // Debug balance.js jika tersedia
+    if (window.BalanceSystem && window.BalanceSystem.debug) {
+        console.log("Balance System Debug:", window.BalanceSystem.debug());
+    }
 };
 
 window.manualUpdateTime = function() {
@@ -448,5 +556,15 @@ window.testError = function(type) {
             updateThemeBasedOnSaldo(testSaldo);
             updateConnectionStatus('online');
             break;
+    }
+};
+
+// Fungsi untuk memicu update manual dari balance.js
+window.forceBalanceUpdate = function() {
+    if (window.BalanceSystem && window.BalanceSystem.forceRefresh) {
+        window.BalanceSystem.forceRefresh();
+        console.log("🔧 Manual update balance.js dipanggil");
+    } else {
+        console.warn("⚠️ BalanceSystem tidak tersedia");
     }
 };
