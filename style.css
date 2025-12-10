@@ -6,7 +6,7 @@
 
 body {
     font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #40E0D0 0%, #006994 100%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -14,6 +14,89 @@ body {
     align-items: center;
     overflow-x: hidden;
     padding: 20px;
+    transition: background 0.8s ease;
+}
+
+/* Tema Warna Berdasarkan Saldo */
+/* Tema 1: Saldo < 500.000 (Merah dan Orange) */
+body.low-balance {
+    background: linear-gradient(135deg, #ff5252 0%, #ff9800 100%);
+}
+
+body.low-balance .card-3d::before {
+    background: linear-gradient(90deg, #ff5252, #ff9800);
+}
+
+body.low-balance .logo i {
+    color: #ff5252;
+    background: linear-gradient(135deg, #ff5252, #ff9800);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 4px rgba(255, 82, 82, 0.3));
+}
+
+body.low-balance .currency {
+    color: #ff5252;
+    text-shadow: 0 2px 4px rgba(255, 82, 82, 0.2);
+}
+
+body.low-balance .stat-icon {
+    background: linear-gradient(135deg, #ff5252, #ff9800);
+    box-shadow: 0 4px 8px rgba(255, 82, 82, 0.3);
+}
+
+/* Tema 2: Saldo 500.000 - 1.000.000 (Orange dan Tosca) */
+body.medium-balance {
+    background: linear-gradient(135deg, #ff9800 0%, #00897b 100%);
+}
+
+body.medium-balance .card-3d::before {
+    background: linear-gradient(90deg, #ff9800, #00897b);
+}
+
+body.medium-balance .logo i {
+    color: #ff9800;
+    background: linear-gradient(135deg, #ff9800, #00897b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 4px rgba(255, 152, 0, 0.3));
+}
+
+body.medium-balance .currency {
+    color: #ff9800;
+    text-shadow: 0 2px 4px rgba(255, 152, 0, 0.2);
+}
+
+body.medium-balance .stat-icon {
+    background: linear-gradient(135deg, #ff9800, #00897b);
+    box-shadow: 0 4px 8px rgba(255, 152, 0, 0.3);
+}
+
+/* Tema 3: Saldo > 1.000.000 (Hijau Tosca dan Biru Turki) */
+body.high-balance {
+    background: linear-gradient(135deg, #00897b 0%, #0693e3 100%);
+}
+
+body.high-balance .card-3d::before {
+    background: linear-gradient(90deg, #00897b, #0693e3);
+}
+
+body.high-balance .logo i {
+    color: #00897b;
+    background: linear-gradient(135deg, #00897b, #0693e3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 4px rgba(0, 137, 123, 0.3));
+}
+
+body.high-balance .currency {
+    color: #00897b;
+    text-shadow: 0 2px 4px rgba(0, 137, 123, 0.2);
+}
+
+body.high-balance .stat-icon {
+    background: linear-gradient(135deg, #00897b, #0693e3);
+    box-shadow: 0 4px 8px rgba(0, 137, 123, 0.3);
 }
 
 .background-3d {
@@ -106,6 +189,7 @@ body {
     overflow: hidden;
     width: 100%;
     max-width: 100%;
+    transition: all 0.8s ease;
 }
 
 .card-3d::before {
@@ -115,8 +199,9 @@ body {
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, #40E0D0, #006994);
+    background: linear-gradient(90deg, #667eea, #764ba2);
     border-radius: 24px 24px 0 0;
+    transition: background 0.8s ease;
 }
 
 @keyframes cardEntrance {
@@ -148,11 +233,12 @@ body {
 
 .logo i {
     font-size: 2rem;
-    color: #40E0D0;
-    background: linear-gradient(135deg, #40E0D0, #006994);
+    color: #667eea;
+    background: linear-gradient(135deg, #667eea, #764ba2);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 2px 4px rgba(64, 224, 208, 0.3));
+    filter: drop-shadow(0 2px 4px rgba(102, 126, 234, 0.3));
+    transition: all 0.8s ease;
 }
 
 h1 {
@@ -220,6 +306,7 @@ h1 {
     transform-style: preserve-3d;
     position: relative;
     overflow: hidden;
+    transition: all 0.8s ease;
 }
 
 .info-card-3d::after {
@@ -254,8 +341,9 @@ h1 {
 }
 
 .card-label i {
-    color: #40E0D0;
+    color: #667eea;
     font-size: 1rem;
+    transition: all 0.8s ease;
 }
 
 /* Saldo display */
@@ -274,9 +362,10 @@ h1 {
 .currency {
     font-size: 1.8rem;
     font-weight: 700;
-    color: #40E0D0;
-    text-shadow: 0 2px 4px rgba(64, 224, 208, 0.2);
+    color: #667eea;
+    text-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
     line-height: 1;
+    transition: all 0.8s ease;
 }
 
 /* Efek kilau saldo */
@@ -299,7 +388,7 @@ h1 {
         90deg,
         #1e293b 0%,
         #475569 45%,
-        #7FDBDA 50%,
+        #a5b4fc 50%,
         #475569 55%,
         #1e293b 100%
     );
@@ -373,16 +462,16 @@ h1 {
     right: 0;
     height: 4px;
     background: linear-gradient(90deg, 
-        #7FDBDA, 
-        #5AB9C7, 
-        #40E0D0,
-        #5AB9C7,
-        #7FDBDA);
+        #c0c0c0, 
+        #f0f0f0, 
+        #ffffff,
+        #f0f0f0,
+        #c0c0c0);
     border-radius: 16px 16px 0 0;
     opacity: 0.9;
     box-shadow: 
-        0 2px 15px rgba(127, 219, 218, 0.5),
-        0 0 25px rgba(64, 224, 208, 0.4);
+        0 2px 15px rgba(192, 192, 192, 0.5),
+        0 0 25px rgba(255, 255, 255, 0.4);
 }
 
 .time-card-3d::after {
@@ -464,15 +553,16 @@ h1 {
 .stat-icon {
     width: 35px;
     height: 35px;
-    background: linear-gradient(135deg, #40E0D0, #006994);
+    background: linear-gradient(135deg, #667eea, #764ba2);
     border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     font-size: 0.9rem;
-    box-shadow: 0 4px 8px rgba(64, 224, 208, 0.3);
+    box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
     flex-shrink: 0;
+    transition: all 0.8s ease;
 }
 
 .stat-info {
@@ -622,7 +712,7 @@ h1 {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: #40E0D0;
+    background: #667eea;
     animation: dotBounce 1.4s infinite ease-in-out both;
 }
 
