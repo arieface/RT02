@@ -1,8 +1,11 @@
 [file name]: script.js
 [file content begin]
 // ==================== KONFIGURASI ====================
-// GANTI DENGAN LINK SERVER DATA KAS RT ANDA
-const SERVER_DATA_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbLFk69seIMkTsx5xGSLyOHM4Iou1uTQMNNpTnwSoWX5Yu2JBgs71Lbd9OH2Xdgq6GKR0_OiTo9shV/pub?gid=236846195&range=A100:A100&single=true&output=csv";
+// URL utama (cache server) - GANTI DENGAN URL ANDA
+const CACHE_SERVER_URL = "https://your-cache-server.vercel.app/api/saldo";
+
+// URL fallback langsung ke sumber data
+const FALLBACK_SERVER_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbLFk69seIMkTsx5xGSLyOHM4Iou1uTQMNNpTnwSoWX5Yu2JBgs71Lbd9OH2Xdgq6GKR0_OiTo9shV/pub?gid=236846195&range=A100:A100&single=true&output=csv";
 
 // ==================== VARIABEL GLOBAL ====================
 let isRefreshing = false;
@@ -12,6 +15,7 @@ let lastSuccessfulFetch = null;
 let isOnline = navigator.onLine;
 let currentTheme = 'default';
 let lastSaldo = 0;
+let currentServer = 'cache'; // 'cache' atau 'fallback'
 
 // ==================== FUNGSI UBAH THEME ====================
 function updateThemeBasedOnSaldo(saldo) {
@@ -25,7 +29,6 @@ function updateThemeBasedOnSaldo(saldo) {
         newTheme = 'teal';
     }
     
-    // Hanya ubah theme jika berbeda
     if (newTheme !== currentTheme) {
         currentTheme = newTheme;
         document.body.setAttribute('data-theme', currentTheme);
@@ -33,7 +36,7 @@ function updateThemeBasedOnSaldo(saldo) {
     }
 }
 
-// ==================== FUNGSI UTAMA ====================
+// ==================== FUNGSI UTAMA DENGAN FALLBACK ====================
 async function fetchSaldo() {
     if (isRefreshing) return;
     
@@ -41,67 +44,36 @@ async function fetchSaldo() {
     updateConnectionStatus('connecting');
     
     try {
-        console.log("📡 Mengambil data dari server...");
+        console.log(`📡 Mencoba server: ${currentServer}`);
         
-        // Update UI ke loading state
         showLoadingState();
         
-        // Fetch data dengan timeout
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 10000);
-        
-        const timestamp = new Date().getTime();
-        const response = await fetch(`${SERVER_DATA_URL}&_=${timestamp}`, {
-            signal: controller.signal,
-            cache: 'no-store',
-            headers: {
-                'Cache-Control': 'no-cache'
-            }
-        });
-        
-        clearTimeout(timeout);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
+        // Coba cache server terlebih dahulu
+        if (currentServer === 'cache') {
+            await fetchFromCacheServer();
+        } else {
+            // Jika sebelumnya gagal, coba fallback
+            await fetchFromFallbackServer();
         }
-        
-        const text = await response.text();
-        console.log("✅ Data diterima dari server:", text);
-        
-        // Process data
-        const processedData = processSaldoData(text);
-        
-        // Update saldo dan theme
-        updateSaldoDisplay(processedData);
-        updateThemeBasedOnSaldo(processedData.numeric);
-        lastSaldo = processedData.numeric;
-        
-        updateConnectionStatus('online');
-        retryCount = 0;
-        lastSuccessfulFetch = new Date();
         
     } catch (error) {
-        console.error("❌ Error koneksi server:", error);
+        console.error(`❌ Gagal dari server ${currentServer}:`, error);
         
-        if (error.name === 'AbortError') {
-            updateConnectionStatus('timeout');
-            showError('Coba lagi - server lambat');
-        } else if (!navigator.onLine) {
-            updateConnectionStatus('offline');
-            showError('Offline - cek koneksi internet');
-        } else if (error.message.includes('HTTP')) {
-            updateConnectionStatus('error');
-            showError('Server tidak dapat diakses');
+        // Switch server jika gagal
+        if (currentServer === 'cache') {
+            console.log('🔄 Beralih ke server fallback...');
+            currentServer = 'fallback';
+            retryCount = 0;
+            
+            // Coba fetch dari fallback
+            try {
+                await fetchFromFallbackServer();
+            } catch (fallbackError) {
+                handleFetchError(fallbackError);
+            }
         } else {
-            updateConnectionStatus('offline');
-            showError('Offline • Menyambungkan...');
-        }
-        
-        // Retry logic
-        if (retryCount < MAX_RETRIES) {
-            retryCount++;
-            console.log(`🔄 Retry ${retryCount}/${MAX_RETRIES} dalam 3 detik...`);
-            setTimeout(fetchSaldo, 3000);
+            // Jika fallback juga gagal
+            handleFetchError(error);
         }
         
     } finally {
@@ -111,49 +83,122 @@ async function fetchSaldo() {
     }
 }
 
+// ==================== FUNGSI FETCH DARI CACHE SERVER ====================
+async function fetchFromCacheServer() {
+    console.log("🚀 Mengambil dari cache server...");
+    
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
+    
+    const response = await fetch(`${CACHE_SERVER_URL}?_=${Date.now()}`, {
+        signal: controller.signal,
+        cache: 'no-store',
+        headers: {
+            'Cache-Control': 'no-cache'
+        }
+    });
+    
+    clearTimeout(timeout);
+    
+    if (!response.ok) {
+        throw new Error(`Cache server HTTP ${response.status}`);
+    }
+    
+    const result = await response.json();
+    
+    if (!result.success) {
+        throw new Error(result.error || 'Cache server error');
+    }
+    
+    console.log(`✅ Data dari cache server: ${result.data?.formatted}`);
+    console.log(`📦 Cached: ${result.cached ? 'Ya' : 'Tidak'}`);
+    
+    updateDisplayWithData(result.data, 'cache');
+}
+
+// ==================== FUNGSI FETCH DARI FALLBACK SERVER ====================
+async function fetchFromFallbackServer() {
+    console.log("🌐 Mengambil dari server fallback...");
+    
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+    
+    const timestamp = new Date().getTime();
+    const response = await fetch(`${FALLBACK_SERVER_URL}&_=${timestamp}`, {
+        signal: controller.signal,
+        cache: 'no-store',
+        headers: {
+            'Cache-Control': 'no-cache'
+        }
+    });
+    
+    clearTimeout(timeout);
+    
+    if (!response.ok) {
+        throw new Error(`Fallback server HTTP ${response.status}`);
+    }
+    
+    const text = await response.text();
+    console.log("📄 Data mentah dari fallback:", text);
+    
+    const processedData = processSaldoData(text);
+    updateDisplayWithData(processedData, 'fallback');
+}
+
+// ==================== FUNGSI UPDATE DISPLAY ====================
+function updateDisplayWithData(data, source) {
+    // Update saldo dan theme
+    updateSaldoDisplay(data);
+    updateThemeBasedOnSaldo(data.numeric);
+    lastSaldo = data.numeric;
+    
+    // Update status berdasarkan sumber
+    if (source === 'cache') {
+        updateConnectionStatus('online');
+        document.getElementById('signal-text').textContent = 'Online (Cache)';
+    } else {
+        updateConnectionStatus('online');
+        document.getElementById('signal-text').textContent = 'Online (Direct)';
+    }
+    
+    retryCount = 0;
+    lastSuccessfulFetch = new Date();
+    
+    // Log sumber data
+    console.log(`✅ Data berhasil diambil dari: ${source}`);
+}
+
 // ==================== FUNGSI PEMROSESAN DATA ====================
 function processSaldoData(rawData) {
-    console.log("🔧 Memproses data dari server...");
+    console.log("🔧 Memproses data...");
     
-    // Trim dan bersihkan data
     let cleaned = rawData.trim();
     
-    // Cek jika data kosong
     if (!cleaned) {
         throw new Error('Data kosong dari server');
     }
     
-    // Coba berbagai format angka
-    let numericValue;
-    
     // Format 1: Rp 1.234.567 atau 1.234.567
     if (cleaned.includes('.')) {
-        // Hapus Rp jika ada
         cleaned = cleaned.replace(/Rp\s*/i, '');
-        // Hapus semua titik (pemisah ribuan)
         cleaned = cleaned.replace(/\./g, '');
-        // Ganti koma dengan titik untuk desimal
         cleaned = cleaned.replace(',', '.');
     }
     // Format 2: 1,234,567 (format internasional)
     else if (cleaned.includes(',')) {
-        // Hapus semua koma
         cleaned = cleaned.replace(/,/g, '');
     }
     
-    // Cek jika ada karakter non-numerik selain minus dan titik
     if (!/^-?\d*\.?\d*$/.test(cleaned)) {
-        throw new Error('Format data server tidak valid');
+        throw new Error('Format data tidak valid');
     }
     
-    // Konversi ke number
-    numericValue = parseFloat(cleaned);
+    const numericValue = parseFloat(cleaned);
     
     if (isNaN(numericValue)) {
-        throw new Error('Tidak dapat mengkonversi data server ke angka');
+        throw new Error('Tidak dapat mengkonversi data ke angka');
     }
     
-    // Format ke Rupiah
     const formatted = new Intl.NumberFormat('id-ID', {
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
@@ -171,13 +216,10 @@ function updateSaldoDisplay(data) {
     const saldoElement = document.getElementById('saldo');
     if (!saldoElement) return;
     
-    // Hapus semua class
     saldoElement.className = 'amount';
-    
-    // Update teks
     saldoElement.textContent = data.formatted;
     
-    // Efek update halus dengan transisi
+    // Efek visual update
     saldoElement.style.transition = 'all 0.5s ease';
     saldoElement.style.transform = 'scale(1.05)';
     saldoElement.style.opacity = '0.8';
@@ -187,7 +229,6 @@ function updateSaldoDisplay(data) {
         saldoElement.style.opacity = '1';
     }, 300);
     
-    // Update waktu
     updateTime();
 }
 
@@ -205,7 +246,8 @@ function showLoadingState() {
     }
     
     if (statusElement) {
-        statusElement.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> <span>Mengambil data terbaru dari server...</span>';
+        const sourceText = currentServer === 'cache' ? 'cache server' : 'server langsung';
+        statusElement.innerHTML = `<i class="fas fa-sync-alt fa-spin"></i> <span>Mengambil data dari ${sourceText}...</span>`;
     }
 }
 
@@ -216,15 +258,13 @@ function updateConnectionStatus(status) {
     
     if (!signalElement || !signalText || !statusElement) return;
     
-    // Reset class
     signalElement.className = 'connection-signal';
     statusElement.className = 'connection-status';
     
     switch(status) {
         case 'online':
             signalElement.classList.add('online');
-            signalText.textContent = 'Online';
-            statusElement.innerHTML = '<i class="fas fa-circle" style="color:#10b981"></i> <span>Terhubung ke server • Data real-time</span>';
+            statusElement.innerHTML = '<i class="fas fa-circle" style="color:#10b981"></i> <span>Terhubung • Data real-time</span>';
             statusElement.classList.add('online');
             break;
             
@@ -256,27 +296,41 @@ function updateConnectionStatus(status) {
     }
 }
 
+function handleFetchError(error) {
+    console.error("❌ Error detail:", error);
+    
+    if (error.name === 'AbortError') {
+        updateConnectionStatus('timeout');
+        showError('Coba lagi - server lambat');
+    } else if (!navigator.onLine) {
+        updateConnectionStatus('offline');
+        showError('Offline - cek koneksi internet');
+    } else if (error.message.includes('HTTP')) {
+        updateConnectionStatus('error');
+        showError('Server tidak dapat diakses');
+    } else {
+        updateConnectionStatus('offline');
+        showError('Koneksi terputus • Menyambungkan...');
+    }
+    
+    // Retry logic
+    if (retryCount < MAX_RETRIES) {
+        retryCount++;
+        console.log(`🔄 Retry ${retryCount}/${MAX_RETRIES} dalam 3 detik...`);
+        setTimeout(fetchSaldo, 3000);
+    } else {
+        // Reset ke cache server setelah beberapa retry
+        console.log('🔄 Reset ke cache server...');
+        currentServer = 'cache';
+        retryCount = 0;
+    }
+}
+
 function showError(message) {
     const saldoElement = document.getElementById('saldo');
     if (!saldoElement) return;
     
-    // Ganti pesan error
-    let displayMessage = message;
-    
-    if (message.includes('server tidak dapat diakses')) {
-        displayMessage = 'Server tidak dapat diakses';
-    }
-    if (message.includes('koneksi server terputus')) {
-        displayMessage = 'Koneksi server terputus';
-    }
-    if (message.includes('server lambat')) {
-        displayMessage = 'Server lambat - coba lagi';
-    }
-    if (message.includes('cek koneksi server')) {
-        displayMessage = 'Cek koneksi server';
-    }
-    
-    saldoElement.textContent = displayMessage;
+    saldoElement.textContent = message;
     saldoElement.className = 'amount error';
 }
 
@@ -285,21 +339,17 @@ function updateTime() {
     const now = new Date();
     const gmt7Time = new Date(now.toLocaleString("en-US", {timeZone: "Asia/Jakarta"}));
 
-    // Format hari
     const hari = gmt7Time.getDate();
     const bulanIndex = gmt7Time.getMonth();
     const tahun = gmt7Time.getFullYear();
     
-    // Format waktu
     const jam = String(gmt7Time.getHours()).padStart(2, '0');
     const menit = String(gmt7Time.getMinutes()).padStart(2, '0');
     const detik = String(gmt7Time.getSeconds()).padStart(2, '0');
     
-    // Nama hari dalam bahasa Indonesia
     const namaHari = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
     const namaHariSekarang = namaHari[gmt7Time.getDay()];
     
-    // Nama bulan dalam bahasa Indonesia
     const namaBulan = [
         "Januari", "Februari", "Maret", "April", 
         "Mei", "Juni", "Juli", "Agustus", 
@@ -307,7 +357,6 @@ function updateTime() {
     ];
     const namaBulanSekarang = namaBulan[bulanIndex];
     
-    // Format: Selasa, 10 Desember 2024 ~ 14:30:45 WIB
     const timeString = `${namaHariSekarang}, ${hari} ${namaBulanSekarang} ${tahun} • ${jam}:${menit}:${detik} WIB`;
     
     const waktuElement = document.getElementById('waktu');
@@ -322,7 +371,6 @@ function checkConnection() {
     
     if (isOnline) {
         updateConnectionStatus('online');
-        // Jika baru online, fetch data
         if (!lastSuccessfulFetch || (Date.now() - lastSuccessfulFetch) > 300000) {
             fetchSaldo();
         }
@@ -335,22 +383,18 @@ function checkConnection() {
 // ==================== INISIALISASI ====================
 document.addEventListener('DOMContentLoaded', function() {
     console.log("🚀 Aplikasi Kas RT02-RW18 dimulai...");
-    console.log("🌐 Server URL:", SERVER_DATA_URL);
+    console.log("🌐 Cache Server URL:", CACHE_SERVER_URL);
+    console.log("🔄 Fallback Server URL:", FALLBACK_SERVER_URL);
     
-    // Set theme default
     document.body.setAttribute('data-theme', 'default');
-    
-    // Update stat "24 Jam Online"
     updateStatsDisplay();
-    
-    // Cek koneksi awal
     checkConnection();
     
-    // Setup event listeners untuk koneksi
+    // Event listeners
     window.addEventListener('online', checkConnection);
     window.addEventListener('offline', checkConnection);
     
-    // Fetch data pertama
+    // Fetch pertama dengan delay kecil
     setTimeout(fetchSaldo, 500);
     
     // Update waktu setiap detik
@@ -364,7 +408,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, 300000);
     
-    // Cek koneksi server secara berkala
+    // Cek koneksi berkala
     setInterval(checkConnection, 30000);
 });
 
@@ -383,74 +427,28 @@ function updateStatsDisplay() {
     }
 }
 
-// ==================== FUNGSI DEBUG (untuk console) ====================
+// ==================== DEBUG FUNCTIONS ====================
 window.debugFetch = function() {
-    console.log("🔧 Debug: Manual fetch dari server");
+    console.log("🔧 Debug: Manual fetch");
+    console.log("Current server:", currentServer);
+    console.log("Retry count:", retryCount);
     fetchSaldo();
 };
 
-window.debugCheckData = function() {
-    console.log("🔧 Debug: Check data state");
-    console.log("Is Refreshing:", isRefreshing);
-    console.log("Retry Count:", retryCount);
-    console.log("Last Fetch:", lastSuccessfulFetch);
-    console.log("Is Online:", isOnline);
-    console.log("Server URL:", SERVER_DATA_URL);
-    console.log("Current Theme:", currentTheme);
-    console.log("Last Saldo:", lastSaldo);
-};
-
-window.manualUpdateTime = function() {
-    console.log("🔧 Debug: Manual update time");
-    updateTime();
-};
-
-// Fungsi untuk testing theme
-window.testTheme = function(saldo) {
-    console.log("🎨 Testing theme dengan saldo:", saldo);
-    updateThemeBasedOnSaldo(saldo);
-    
-    // Update display dengan saldo dummy
-    const saldoElement = document.getElementById('saldo');
-    if (saldoElement) {
-        const formatted = new Intl.NumberFormat('id-ID').format(saldo);
-        saldoElement.textContent = formatted;
-        saldoElement.className = 'amount';
-        lastSaldo = saldo;
+window.switchServer = function(serverType) {
+    if (serverType === 'cache' || serverType === 'fallback') {
+        currentServer = serverType;
+        console.log(`🔄 Switch ke server: ${serverType}`);
+        fetchSaldo();
     }
 };
 
-// Fungsi untuk testing error messages
-window.testError = function(type) {
-    const saldoElement = document.getElementById('saldo');
-    if (!saldoElement) return;
-    
-    switch(type) {
-        case 'offline':
-            showError('Offline - cek koneksi server');
-            updateConnectionStatus('offline');
-            break;
-        case 'timeout':
-            showError('Server lambat - coba lagi');
-            updateConnectionStatus('timeout');
-            break;
-        case 'error':
-            showError('Koneksi server terputus');
-            updateConnectionStatus('error');
-            break;
-        case 'loading':
-            showLoadingState();
-            break;
-        case 'success':
-            const testSaldo = 1500000;
-            updateSaldoDisplay({
-                raw: "Rp 15.000.000",
-                numeric: testSaldo,
-                formatted: "15.000.000"
-            });
-            updateThemeBasedOnSaldo(testSaldo);
-            updateConnectionStatus('online');
-            break;
-    }
+window.showServerInfo = function() {
+    console.log("📊 Server Information:");
+    console.log("Current server:", currentServer);
+    console.log("Cache URL:", CACHE_SERVER_URL);
+    console.log("Fallback URL:", FALLBACK_SERVER_URL);
+    console.log("Last successful fetch:", lastSuccessfulFetch);
+    console.log("Last saldo:", lastSaldo);
 };
 [file content end]
