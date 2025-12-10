@@ -156,8 +156,31 @@ function updateSaldoDisplay(data) {
         saldoElement.style.opacity = '1';
     }, 300);
     
+    // Update tema warna berdasarkan saldo
+    updateThemeBySaldo(data.numeric);
+    
     // Update waktu
     updateTime();
+}
+
+// Fungsi untuk mengubah tema warna berdasarkan saldo
+function updateThemeBySaldo(saldo) {
+    const body = document.body;
+    
+    // Hapus semua class tema
+    body.classList.remove('low-balance', 'medium-balance', 'high-balance');
+    
+    // Tambahkan class tema sesuai dengan nilai saldo
+    if (saldo < 500000) {
+        body.classList.add('low-balance');
+        console.log('Tema: Saldo Rendah (Merah dan Orange)');
+    } else if (saldo >= 500000 && saldo < 1000000) {
+        body.classList.add('medium-balance');
+        console.log('Tema: Saldo Sedang (Orange dan Tosca)');
+    } else {
+        body.classList.add('high-balance');
+        console.log('Tema: Saldo Tinggi (Hijau Tosca dan Biru Turki)');
+    }
 }
 
 function showLoadingState() {
@@ -402,4 +425,10 @@ window.testError = function(type) {
             updateConnectionStatus('online');
             break;
     }
+};
+
+// Fungsi untuk testing tema warna
+window.testTheme = function(saldo) {
+    updateThemeBySaldo(saldo);
+    console.log(`Tema diubah untuk saldo: Rp ${saldo.toLocaleString('id-ID')}`);
 };
