@@ -134,9 +134,9 @@ async function updateSaldo(isForceRefresh = false) {
     }
 }
 
-// Fungsi untuk force refresh yang lebih agresif
+// Fungsi untuk force refresh yang lebih agresif (Hard Refresh)
 async function aggressiveForceRefresh() {
-    console.log("🔥 [Balance] Melakukan force refresh agresif...");
+    console.log("🔥 [Balance] Melakukan HARD REFRESH agresif...");
     
     // Coba beberapa metode cache-busting
     const methods = [
@@ -224,7 +224,7 @@ async function aggressiveForceRefresh() {
         }
     }
     
-    console.error("❌ [Balance] Semua metode force refresh gagal");
+    console.error("❌ [Balance] Semua metode HARD REFRESH gagal");
 }
 
 // ==================== INISIALISASI ====================
@@ -306,7 +306,7 @@ window.BalanceSystem = {
     // Actions
     refresh: updateSaldo,
     forceRefresh: () => {
-        console.log("🔧 [Balance] Manual force refresh");
+        console.log("🔧 [Balance] Manual HARD REFRESH dipanggil");
         aggressiveForceRefresh();
     },
     
