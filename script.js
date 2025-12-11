@@ -1,5 +1,4 @@
 // ==================== KONFIGURASI ====================
-const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbLFk69seIMkTsx5xGSLyOHM4Iou1uTQMNNpTnwSoWX5Yu2JBgs71Lbd9OH2Xdgq6GKR0_OiTo9shV/pub?gid=236846195&range=A100:A100&single=true&output=csv";
 let balanceSystemReady = false;
 
 // ==================== VARIABEL GLOBAL ====================
@@ -124,6 +123,9 @@ async function fetchSaldo() {
 
 // ==================== FUNGSI FALLBACK ====================
 async function fetchDirectFromGoogleSheets() {
+    // Ambil URL dari BalanceSystem atau gunakan yang sama
+    const FALLBACK_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbLFk69seIMkTsx5xGSLyOHM4Iou1uTQMNNpTnwSoWX5Yu2JBgs71Lbd9OH2Xdgq6GKR0_OiTo9shV/pub?gid=236846195&range=A100:A100&single=true&output=csv";
+    
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000);
     
@@ -133,13 +135,12 @@ async function fetchDirectFromGoogleSheets() {
         const timestamp = new Date().getTime();
         const randomParam = Math.random().toString(36).substring(7);
         
-        const response = await fetch(`${SHEET_URL}&_=${timestamp}&rand=${randomParam}`, {
+        const response = await fetch(`${FALLBACK_URL}&_=${timestamp}&rand=${randomParam}`, {
             signal: controller.signal,
             cache: 'no-store',
             headers: {
                 'Cache-Control': 'no-cache, no-store, must-revalidate',
-                'Pragma': 'no-cache',
-                'Expires': '0'
+                'Pragma': 'no-cache'
             }
         });
         
