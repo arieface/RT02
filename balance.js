@@ -21,10 +21,9 @@ async function fetchAndProcessSaldo() {
         
         const response = await fetch(urlWithCacheBuster, {
             cache: 'no-store',
+            mode: 'cors', // Explicitly set CORS mode
             headers: { 
-                'Cache-Control': 'no-cache, no-store, must-revalidate',
-                'Pragma': 'no-cache',
-                'Expires': '0'
+                'Cache-Control': 'no-cache'
             }
         });
         
