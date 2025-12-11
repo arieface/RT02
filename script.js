@@ -40,11 +40,6 @@ window.addEventListener('balanceUpdated', (event) => {
                 }).format(event.detail.saldo)
         };
         
-        // Tampilkan indikator real-time jika diperlukan
-        if (event.detail.isRealTime) {
-            showRealTimeIndicator();
-        }
-        
         updateSaldoDisplay(processedData);
         updateThemeBasedOnSaldo(processedData.numeric);
         lastSaldo = processedData.numeric;
@@ -202,18 +197,6 @@ function updateStatusText(status) {
             statusElement.style.transform = 'scale(1)';
             statusElement.style.opacity = '1';
         }, 150);
-    }
-}
-
-// Fungsi untuk menampilkan indikator real-time
-function showRealTimeIndicator() {
-    const statusElement = document.getElementById('connection-status');
-    if (statusElement) {
-        statusElement.innerHTML = '<i class="fas fa-bolt" style="color:#10b981"></i> <span>Real-time • Data terbaru</span>';
-        
-        setTimeout(() => {
-            updateConnectionStatus('online');
-        }, 2000);
     }
 }
 
@@ -415,14 +398,5 @@ window.testTheme = function(saldo) {
         saldoElement.textContent = formatted;
         saldoElement.className = 'amount';
         lastSaldo = saldo;
-    }
-};
-
-window.forceBalanceUpdate = function() {
-    if (window.BalanceSystem && window.BalanceSystem.forceRefresh) {
-        window.BalanceSystem.forceRefresh();
-        console.log("🔧 Manual force refresh balance.js dipanggil");
-    } else {
-        console.warn("⚠️ BalanceSystem tidak tersedia");
     }
 };
