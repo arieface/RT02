@@ -270,7 +270,7 @@ function handleFetchError(error) {
         showError('Offline - cek koneksi');
     } else {
         updateConnectionStatus('error');
-        showError('Mengambil data');
+        showError('Memuat data');
     }
     
     if (retryCount < MAX_RETRIES) {
@@ -294,7 +294,7 @@ function showLoadingState() {
     }
     
     if (statusElement) {
-        statusElement.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> <span>Mengambil data...</span>';
+        statusElement.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> <span>Memuat data...</span>';
     }
 }
 
