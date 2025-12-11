@@ -270,7 +270,7 @@ function handleFetchError(error) {
         showError('Offline - cek koneksi');
     } else {
         updateConnectionStatus('error');
-        showError('Gagal ambil data');
+        showError('Mengambil data');
     }
     
     if (retryCount < MAX_RETRIES) {
@@ -333,7 +333,7 @@ function updateConnectionStatus(status) {
             break;
         case 'error':
             signalElement.classList.add('offline');
-            signalText.textContent = 'Error';
+            signalText.textContent = 'Offline';
             statusElement.innerHTML = '<i class="fas fa-circle" style="color:#ef4444"></i> <span>Offline • Menyambungkan...</span>';
             statusElement.classList.add('offline');
             break;
