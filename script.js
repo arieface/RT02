@@ -14,25 +14,20 @@ let lastSaldo = 0;
 
 // ==================== EVENT LISTENERS ====================
 
-// Event 1: Balance.js siap
 window.addEventListener('balanceReady', () => {
     console.log("🎯 [Script] Balance.js siap!");
     balanceSystemReady = true;
     
-    // Set URL
     if (window.BalanceSystem && window.BalanceSystem.getCurrentSaldo()) {
-        DATABASE_URL = "data_from_balance"; // Flag khusus
+        DATABASE_URL = "data_from_balance";
     }
     
-    // Fetch data pertama
     setTimeout(fetchSaldo, 500);
 });
 
-// Event 2: Data diupdate oleh balance.js
 window.addEventListener('balanceUpdated', (event) => {
     console.log("📬 [Script] Data baru dari balance.js:", event.detail);
     
-    // PERBAIKAN: Hanya proses jika data VALID
     if (event.detail && event.detail.saldo !== null && !isNaN(event.detail.saldo)) {
         
         const processedData = {
@@ -45,6 +40,11 @@ window.addEventListener('balanceUpdated', (event) => {
                 }).format(event.detail.saldo)
         };
         
+        // Tampilkan indikator real-time jika diperlukan
+        if (event.detail.isRealTime) {
+            showRealTimeIndicator();
+        }
+        
         updateSaldoDisplay(processedData);
         updateThemeBasedOnSaldo(processedData.numeric);
         lastSaldo = processedData.numeric;
@@ -52,7 +52,6 @@ window.addEventListener('balanceUpdated', (event) => {
         updateConnectionStatus('online');
         lastSuccessfulFetch = new Date();
         
-        // Update waktu
         updateTime();
         
         console.log("✅ [Script] Tampilan diperbarui dari balance.js");
@@ -72,7 +71,6 @@ async function fetchSaldo() {
         console.log("📡 [Script] Memulai fetch saldo...");
         showLoadingState();
         
-        // PERBAIKAN: Hanya gunakan data dari balance.js
         if (balanceSystemReady && window.BalanceSystem) {
             const cachedSaldo = window.BalanceSystem.getCurrentSaldo();
             
@@ -95,19 +93,16 @@ async function fetchSaldo() {
                 updateConnectionStatus('online');
                 lastSuccessfulFetch = new Date();
                 
-                return; // SELESAI
+                return;
             }
         }
         
-        // PERBAIKAN: Minta balance.js refresh tanpa fallback
         if (window.BalanceSystem && window.BalanceSystem.refresh) {
             console.log("🔄 [Script] Minta balance.js refresh...");
             window.BalanceSystem.refresh();
             
-            // Tunggu 1 detik untuk balance.js merespons
             await new Promise(resolve => setTimeout(resolve, 1000));
             
-            // Cek lagi
             if (window.BalanceSystem.getCurrentSaldo()) {
                 const newSaldo = window.BalanceSystem.getCurrentSaldo();
                 const processedData = {
@@ -126,7 +121,7 @@ async function fetchSaldo() {
                 updateConnectionStatus('online');
                 lastSuccessfulFetch = new Date();
                 
-                return; // SELESAI
+                return;
             }
         }
         
@@ -150,7 +145,6 @@ function updateSaldoDisplay(data) {
     saldoElement.className = 'amount';
     saldoElement.textContent = data.formatted;
     
-    // Animasi lebih halus untuk update cepat
     saldoElement.style.transition = 'all 0.3s ease';
     saldoElement.style.transform = 'scale(1.02)';
     saldoElement.style.opacity = '0.9';
@@ -165,7 +159,7 @@ function updateSaldoDisplay(data) {
 
 function updateThemeBasedOnSaldo(saldo) {
     let newTheme = 'default';
-    let statusText = ' '; // Default status
+    let statusText = ' ';
     
     if (saldo < 500000) {
         newTheme = 'red';
@@ -178,20 +172,16 @@ function updateThemeBasedOnSaldo(saldo) {
         statusText = 'Optimal';
     }
     
-    // Update status text
     updateStatusText(statusText);
     
     if (newTheme !== currentTheme) {
-        // Tambahkan kelas changing-theme untuk efek transisi
         document.body.classList.add('changing-theme');
         
-        // Setelah sedikit delay, ubah tema
         setTimeout(() => {
             currentTheme = newTheme;
             document.body.setAttribute('data-theme', currentTheme);
             console.log(`🎨 Theme: ${currentTheme} (Saldo: ${saldo})`);
             
-            // Setelah transisi selesai, hapus kelas changing-theme
             setTimeout(() => {
                 document.body.classList.remove('changing-theme');
             }, 2500);
@@ -199,13 +189,11 @@ function updateThemeBasedOnSaldo(saldo) {
     }
 }
 
-// Fungsi untuk memperbarui teks status
 function updateStatusText(status) {
     const statusElement = document.getElementById('status-text');
     if (statusElement) {
         statusElement.textContent = status;
         
-        // Animasi lebih halus untuk update cepat
         statusElement.style.transition = 'all 0.3s ease';
         statusElement.style.transform = 'scale(1.02)';
         statusElement.style.opacity = '0.9';
@@ -214,6 +202,18 @@ function updateStatusText(status) {
             statusElement.style.transform = 'scale(1)';
             statusElement.style.opacity = '1';
         }, 150);
+    }
+}
+
+// Fungsi untuk menampilkan indikator real-time
+function showRealTimeIndicator() {
+    const statusElement = document.getElementById('connection-status');
+    if (statusElement) {
+        statusElement.innerHTML = '<i class="fas fa-bolt" style="color:#10b981"></i> <span>Real-time • Data terbaru</span>';
+        
+        setTimeout(() => {
+            updateConnectionStatus('online');
+        }, 2000);
     }
 }
 
@@ -250,7 +250,6 @@ function showLoadingState() {
         saldoElement.className = 'amount';
     }
     
-    // Update status ke "Memuat" saat loading
     if (statusElement) {
         statusElement.textContent = ' ';
     }
@@ -337,7 +336,7 @@ function checkConnection() {
     
     if (isOnline) {
         updateConnectionStatus('online');
-        if (!lastSuccessfulFetch || (Date.now() - lastSuccessfulFetch) > 5000) { // 5 detik
+        if (!lastSuccessfulFetch || (Date.now() - lastSuccessfulFetch) > 5000) {
             fetchSaldo();
         }
     } else {
@@ -364,32 +363,24 @@ function updateStatsDisplay() {
 document.addEventListener('DOMContentLoaded', function() {
     console.log("🚀 [Script] Aplikasi dimulai...");
     
-    // Setup awal
     document.body.setAttribute('data-theme', 'default');
     updateStatsDisplay();
     checkConnection();
     
-    // Event listeners
     window.addEventListener('online', checkConnection);
     window.addEventListener('offline', checkConnection);
     
-    // Cek apakah balance.js sudah ada
     if (window.BalanceSystem) {
         console.log("⚡ [Script] Balance.js sudah loaded");
         balanceSystemReady = true;
     }
     
-    // Tunggu 1 detik baru fetch pertama
     setTimeout(() => {
         fetchSaldo();
     }, 1000);
     
-    // Update waktu
     updateTime();
     setInterval(updateTime, 1000);
-    
-    // PERBAIKAN: Hapus interval update di script.js
-    // Biarkan balance.js menangani semua update berkala
 });
 
 // ==================== FUNGSI DEBUG ====================
@@ -424,5 +415,14 @@ window.testTheme = function(saldo) {
         saldoElement.textContent = formatted;
         saldoElement.className = 'amount';
         lastSaldo = saldo;
+    }
+};
+
+window.forceBalanceUpdate = function() {
+    if (window.BalanceSystem && window.BalanceSystem.forceRefresh) {
+        window.BalanceSystem.forceRefresh();
+        console.log("🔧 Manual force refresh balance.js dipanggil");
+    } else {
+        console.warn("⚠️ BalanceSystem tidak tersedia");
     }
 };
