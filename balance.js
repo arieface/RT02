@@ -1,6 +1,6 @@
 // ==================== KONFIGURASI =====================
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbLFk69seIMkTsx5xGSLyOHM4Iou1uTQMNNpTnwSoWX5Yu2JBgs71Lbd9OH2Xdgq6GKR0_OiTo9shV/pub?gid=236846195&range=A100:A100&single=true&output=csv";
-const UPDATE_INTERVAL = 5000; // 5 detik
+const UPDATE_INTERVAL = 300000; // 5 menit
 
 // ==================== VARIABEL GLOBAL ====================
 let currentSaldo = null;
@@ -8,9 +8,6 @@ let lastUpdateTime = null;
 let isUpdating = false;
 let updateTimer = null;
 let isInitialized = false;
-let lastFetchTime = 0;
-let consecutiveSameValues = 0;
-let lastFetchValue = null;
 
 // ==================== FUNGSI UTAMA ====================
 
@@ -18,14 +15,16 @@ async function fetchAndProcessSaldo() {
     try {
         console.log("📡 [Balance] Mengambil dari Google Sheets...");
         
-        // Cache-busting sederhana namun efektif
+        // Cache busting yang lebih kuat
         const timestamp = new Date().getTime();
-        const urlWithCacheBuster = `${SHEET_URL}&t=${timestamp}`;
-        
-        // Request tanpa header yang menyebabkan masalah CORS
-        const response = await fetch(urlWithCacheBuster, {
+        const randomParam = Math.random().toString(36).substring(7);
+        const response = await fetch(`${SHEET_URL}&_=${timestamp}&rand=${randomParam}`, {
             cache: 'no-store',
-            mode: 'cors'
+            headers: { 
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            }
         });
         
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -33,17 +32,24 @@ async function fetchAndProcessSaldo() {
         const text = await response.text().then(t => t.trim());
         console.log("📄 [Balance] Data mentah:", text);
         
-        // Periksa error Google Sheets
-        if (text.includes('#NAME?') || text.includes('#REF!') || text.includes('#VALUE!') || text.includes('#DIV/0!')) {
-            console.error("❌ [Balance] Error dari Google Sheets:", text);
+        if (!text || text === '') {
+            console.warn("⚠️ [Balance] Data kosong");
             return null;
         }
         
-        // Proses data
+        // PROSES DATA dengan berbagai format
         let cleaned = text;
-        cleaned = cleaned.replace(/Rp\s*/i, '');
+        
+        // 1. Hapus "Rp" jika ada
+        cleaned = cleaned.replace(/Rp\s*/gi, '');
+        
+        // 2. Hapus titik (ribuan separator)
         cleaned = cleaned.replace(/\./g, '');
-        cleaned = cleaned.replace(',', '.');
+        
+        // 3. Ganti koma dengan titik untuk desimal
+        cleaned = cleaned.replace(/,/g, '.');
+        
+        // 4. Hapus karakter non-numerik kecuali titik dan minus
         cleaned = cleaned.replace(/[^\d.-]/g, '');
         
         console.log("🧹 [Balance] Setelah cleaning:", cleaned);
@@ -60,17 +66,7 @@ async function fetchAndProcessSaldo() {
             return null;
         }
         
-        // Track nilai yang sama berturut-turut
-        if (lastFetchValue === numericValue) {
-            consecutiveSameValues++;
-            console.log(`📊 [Balance] Nilai sama berturut-turut: ${consecutiveSameValues} kali`);
-        } else {
-            consecutiveSameValues = 0;
-            lastFetchValue = numericValue;
-        }
-        
-        lastFetchTime = Date.now();
-        console.log(`✅ [Balance] Berhasil: ${numericValue}`);
+        console.log(`✅ [Balance] Berhasil parse: ${numericValue}`);
         return numericValue;
         
     } catch (error) {
@@ -81,34 +77,41 @@ async function fetchAndProcessSaldo() {
 
 async function updateSaldo() {
     if (isUpdating) {
-        console.log("⏳ [Balance] Update sudah berjalan...");
+        console.log("⏳ [Balance] Update sudah berjalan, skip...");
         return;
     }
     
     isUpdating = true;
-    console.log("🔄 [Balance] Memulai update...");
+    console.log("🔄 [Balance] Memulai update saldo...");
     
     try {
         const newSaldo = await fetchAndProcessSaldo();
         
-        // Hanya update jika data valid dan berbeda
-        if (newSaldo !== null && newSaldo !== currentSaldo) {
+        if (newSaldo !== null && newSaldo !== undefined) {
+            // Cek apakah ada perubahan
+            const hasChanged = currentSaldo !== newSaldo;
+            
+            // Simpan ke variabel global
             currentSaldo = newSaldo;
             lastUpdateTime = new Date().toISOString();
             
-            console.log(`💾 [Balance] Saldo disimpan: ${newSaldo}`);
+            console.log(`💾 [Balance] Saldo ${hasChanged ? 'BERUBAH' : 'sama'}: ${newSaldo}`);
             
-            // Kirim event ke script.js
+            // KIRIM EVENT ke script.js - SELALU kirim untuk memastikan UI update
             const event = new CustomEvent('balanceUpdated', {
                 detail: {
                     saldo: newSaldo,
                     timestamp: lastUpdateTime,
-                    formatted: new Intl.NumberFormat('id-ID').format(newSaldo)
+                    formatted: new Intl.NumberFormat('id-ID', {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0
+                    }).format(newSaldo),
+                    changed: hasChanged
                 }
             });
             window.dispatchEvent(event);
-        } else if (newSaldo !== null) {
-            console.log(`📊 [Balance] Saldo tidak berubah: ${newSaldo}`);
+            console.log("📤 [Balance] Event 'balanceUpdated' dikirim");
+            
         } else {
             console.warn("⚠️ [Balance] Gagal mendapatkan saldo baru");
         }
@@ -132,6 +135,7 @@ async function initialize() {
     console.log("🚀 [Balance] Inisialisasi sistem...");
     
     try {
+        // Tunggu DOM siap
         if (document.readyState !== 'loading') {
             await initBalance();
         } else {
@@ -146,27 +150,30 @@ async function initialize() {
 async function initBalance() {
     console.log("📦 [Balance] DOM siap, mulai setup...");
     
-    // 1. Load pertama kali
+    // 1. Load pertama kali - CRITICAL
     await updateSaldo();
     
-    // 2. Setup auto-update setiap 5 detik
+    // 2. Setup auto-update setiap 5 menit
+    if (updateTimer) {
+        clearInterval(updateTimer);
+    }
     updateTimer = setInterval(() => {
-        console.log("⏰ [Balance] Interval update terpicu (5 detik)");
+        console.log("⏰ [Balance] Auto-update triggered");
         updateSaldo();
     }, UPDATE_INTERVAL);
-    console.log(`⏰ [Balance] Auto-update diatur (${UPDATE_INTERVAL/1000} detik)`);
+    console.log(`⏰ [Balance] Auto-update diatur setiap ${UPDATE_INTERVAL/60000} menit`);
     
-    // 3. Update saat tab aktif
+    // 3. Update saat tab aktif kembali
     document.addEventListener('visibilitychange', () => {
         if (!document.hidden) {
-            console.log("👁️ [Balance] Tab aktif, refresh...");
+            console.log("👁️ [Balance] Tab aktif, refresh data...");
             updateSaldo();
         }
     });
     
-    // 4. Update saat online
+    // 4. Update saat koneksi kembali online
     window.addEventListener('online', () => {
-        console.log("🌐 [Balance] Online, refresh...");
+        console.log("🌐 [Balance] Koneksi online, refresh data...");
         updateSaldo();
     });
     
@@ -174,29 +181,52 @@ async function initBalance() {
     console.log("✅ [Balance] Sistem siap!");
     
     // Kirim event bahwa balance.js siap
-    const readyEvent = new CustomEvent('balanceReady');
+    const readyEvent = new CustomEvent('balanceReady', {
+        detail: {
+            ready: true,
+            timestamp: new Date().toISOString()
+        }
+    });
     window.dispatchEvent(readyEvent);
 }
 
 // ==================== PUBLIC API ====================
 
 window.BalanceSystem = {
+    // Status
     isReady: () => isInitialized,
+    isUpdating: () => isUpdating,
+    
+    // Data
     getCurrentSaldo: () => currentSaldo,
     getLastUpdateTime: () => lastUpdateTime,
-    refresh: updateSaldo,
+    
+    // Actions
+    refresh: async () => {
+        console.log("🔄 [Balance] Manual refresh dipanggil");
+        await updateSaldo();
+    },
+    
+    forceRefresh: async () => {
+        console.log("🔧 [Balance] Force refresh");
+        isUpdating = false; // Reset flag
+        await updateSaldo();
+    },
+    
+    // Debug
     debug: () => ({
         currentSaldo,
         lastUpdateTime,
         isUpdating,
         isInitialized,
-        lastFetchTime,
-        consecutiveSameValues,
-        lastFetchValue
+        updateInterval: UPDATE_INTERVAL
     })
 };
 
 // ==================== AUTO START ====================
+console.log("🎬 [Balance] Script loaded");
 setTimeout(() => {
-    initialize().catch(console.error);
+    initialize().catch(error => {
+        console.error("❌ [Balance] Initialize failed:", error);
+    });
 }, 100);
