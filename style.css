@@ -648,7 +648,7 @@ h1 {
 .watermark {
     text-align: center;
     margin-top: 20px;
-    color: rgba(0, 0, 0, 0.6);
+    color: rgba(0, 0, 0, 0.6); /* Warna default untuk tema silver (hitam) */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -661,6 +661,12 @@ h1 {
     z-index: 9999;
 }
 
+/* Warna watermark untuk tema lain (light gray/silver) */
+[data-theme="red"] .watermark,
+[data-theme="yellow-orange"] .watermark,
+[data-theme="teal"] .watermark {
+    color: rgba(211, 211, 211, 0.9); /* Light gray/silver dengan opacity tinggi */
+}
 /* Loading dots (text) */
 .loading-dots {
     display: inline-flex;
