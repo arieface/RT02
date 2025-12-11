@@ -43,6 +43,11 @@ window.addEventListener('balanceUpdated', (event) => {
                 }).format(event.detail.saldo)
         };
         
+        // Tampilkan indikator force refresh jika diperlukan
+        if (event.detail.isForceRefresh) {
+            showForceRefreshIndicator();
+        }
+        
         updateSaldoDisplay(processedData);
         updateThemeBasedOnSaldo(processedData.numeric);
         lastSaldo = processedData.numeric;
@@ -149,12 +154,14 @@ async function fetchDirectFromGoogleSheets() {
     
     try {
         // Tambahkan cache buster
-        const urlWithCacheBuster = `${SHEET_URL}&_=${Date.now()}`;
+        const timestamp = new Date().getTime();
+        const random = Math.floor(Math.random() * 10000);
+        const urlWithCacheBuster = `${SHEET_URL}&_=${timestamp}&rand=${random}`;
         
         const response = await fetch(urlWithCacheBuster, {
             signal: controller.signal,
             cache: 'no-store',
-            mode: 'cors', // Explicitly set CORS mode
+            mode: 'cors',
             headers: { 
                 'Cache-Control': 'no-cache'
             }
@@ -296,6 +303,19 @@ function updateStatusText(status) {
             statusElement.style.transform = 'scale(1)';
             statusElement.style.opacity = '1';
         }, 150);
+    }
+}
+
+// Fungsi untuk menampilkan indikator force refresh
+function showForceRefreshIndicator() {
+    const statusElement = document.getElementById('connection-status');
+    if (statusElement) {
+        statusElement.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> <span>Force refresh • Memuat data terbaru...</span>';
+        
+        // Kembalikan ke status normal setelah 2 detik
+        setTimeout(() => {
+            updateConnectionStatus('online');
+        }, 2000);
     }
 }
 
@@ -517,7 +537,7 @@ window.testTheme = function(saldo) {
 window.forceBalanceUpdate = function() {
     if (window.BalanceSystem && window.BalanceSystem.forceRefresh) {
         window.BalanceSystem.forceRefresh();
-        console.log("🔧 Manual update balance.js dipanggil");
+        console.log("🔧 Manual force refresh balance.js dipanggil");
     } else {
         console.warn("⚠️ BalanceSystem tidak tersedia");
     }
