@@ -100,8 +100,8 @@ async function fetchSaldo() {
             console.log("🔄 [Script] Minta balance.js refresh...");
             window.BalanceSystem.refresh();
             
-            // Tunggu 3 detik untuk balance.js merespons
-            await new Promise(resolve => setTimeout(resolve, 3000));
+            // Tunggu 1 detik untuk balance.js merespons (dipercepat karena update 5 detik)
+            await new Promise(resolve => setTimeout(resolve, 1000));
             
             // Cek lagi
             if (window.BalanceSystem.getCurrentSaldo()) {
@@ -136,7 +136,7 @@ async function fetchSaldo() {
     } finally {
         setTimeout(() => {
             isRefreshing = false;
-        }, 1000);
+        }, 500); // Dipercepat untuk update 5 detik
     }
 }
 
@@ -145,12 +145,20 @@ async function fetchDirectFromGoogleSheets() {
     const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbLFk69seIMkTsx5xGSLyOHM4Iou1uTQMNNpTnwSoWX5Yu2JBgs71Lbd9OH2Xdgq6GKR0_OiTo9shV/pub?gid=236846195&range=A100:A100&single=true&output=csv";
     
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 15000);
+    const timeout = setTimeout(() => controller.abort(), 10000); // Dipercepat timeout
     
     try {
-        const response = await fetch(`${SHEET_URL}&_=${Date.now()}`, {
+        // Tambahkan cache buster
+        const urlWithCacheBuster = `${SHEET_URL}&_=${Date.now()}`;
+        
+        const response = await fetch(urlWithCacheBuster, {
             signal: controller.signal,
-            cache: 'no-store'
+            cache: 'no-store',
+            headers: { 
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            }
         });
         
         clearTimeout(timeout);
@@ -225,14 +233,15 @@ function updateSaldoDisplay(data) {
     saldoElement.className = 'amount';
     saldoElement.textContent = data.formatted;
     
-    saldoElement.style.transition = 'all 0.5s ease';
-    saldoElement.style.transform = 'scale(1.05)';
-    saldoElement.style.opacity = '0.8';
+    // Animasi lebih halus untuk update cepat
+    saldoElement.style.transition = 'all 0.3s ease';
+    saldoElement.style.transform = 'scale(1.02)';
+    saldoElement.style.opacity = '0.9';
     
     setTimeout(() => {
         saldoElement.style.transform = 'scale(1)';
         saldoElement.style.opacity = '1';
-    }, 300);
+    }, 150);
     
     updateTime();
 }
@@ -279,15 +288,15 @@ function updateStatusText(status) {
     if (statusElement) {
         statusElement.textContent = status;
         
-        // Tambahkan animasi saat status berubah
-        statusElement.style.transition = 'all 0.5s ease';
-        statusElement.style.transform = 'scale(1.05)';
-        statusElement.style.opacity = '0.8';
+        // Animasi lebih halus untuk update cepat
+        statusElement.style.transition = 'all 0.3s ease';
+        statusElement.style.transform = 'scale(1.02)';
+        statusElement.style.opacity = '0.9';
         
         setTimeout(() => {
             statusElement.style.transform = 'scale(1)';
             statusElement.style.opacity = '1';
-        }, 300);
+        }, 150);
     }
 }
 
@@ -306,7 +315,7 @@ function handleFetchError(error) {
     if (retryCount < MAX_RETRIES) {
         retryCount++;
         console.log(`🔄 Retry ${retryCount}/${MAX_RETRIES}...`);
-        setTimeout(fetchSaldo, 3000);
+        setTimeout(fetchSaldo, 2000); // Dipercepat retry
     }
 }
 
@@ -348,7 +357,7 @@ function updateConnectionStatus(status) {
         case 'online':
             signalElement.classList.add('online');
             signalText.textContent = 'Online';
-            statusElement.innerHTML = '<i class="fas fa-circle" style="color:#10b981"></i> <span>Terhubung • Data real-time</span>';
+            statusElement.innerHTML = '<i class="fas fa-circle" style="color:#10b981"></i> <span>Terhubung • Real-time</span>';
             statusElement.classList.add('online');
             break;
         case 'connecting':
@@ -411,7 +420,7 @@ function checkConnection() {
     
     if (isOnline) {
         updateConnectionStatus('online');
-        if (!lastSuccessfulFetch || (Date.now() - lastSuccessfulFetch) > 300000) {
+        if (!lastSuccessfulFetch || (Date.now() - lastSuccessfulFetch) > 5000) { // 5 detik
             fetchSaldo();
         }
     } else {
@@ -428,8 +437,8 @@ function updateStatsDisplay() {
         const statLabel = timeStat.querySelector('.stat-label');
         
         if (statValue && statLabel) {
-            statValue.textContent = '24 Jam';
-            statLabel.textContent = 'Akses';
+            statValue.textContent = 'Real-time';
+            statLabel.textContent = 'Update';
         }
     }
 }
@@ -453,21 +462,22 @@ document.addEventListener('DOMContentLoaded', function() {
         balanceSystemReady = true;
     }
     
-    // Tunggu 2 detik baru fetch pertama
+    // Tunggu 1 detik baru fetch pertama (dipercepat)
     setTimeout(() => {
         fetchSaldo();
-    }, 2000);
+    }, 1000);
     
     // Update waktu
     updateTime();
     setInterval(updateTime, 1000);
     
-    // Auto-refresh
+    // Auto-refresh setiap 5 detik
     setInterval(() => {
         if (isOnline) {
+            console.log("⏰ [Script] Interval update terpicu (5 detik)");
             fetchSaldo();
         }
-    }, 300000);
+    }, 5000);
 });
 
 // ==================== FUNGSI DEBUG ====================
