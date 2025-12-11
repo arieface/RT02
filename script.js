@@ -1,4 +1,4 @@
-// ==================== KONFIGURASI =====================
+// ==================== KONFIGURASI ====================
 let DATABASE_URL = null;
 let balanceSystemReady = false;
 
@@ -238,10 +238,27 @@ function updateSaldoDisplay(data) {
 
 function updateThemeBasedOnSaldo(saldo) {
     let newTheme = 'default';
+    let statusText = '';
     
-    if (saldo < 500000) newTheme = 'red';
-    else if (saldo >= 500000 && saldo < 1000000) newTheme = 'yellow-orange';
-    else if (saldo >= 1000000) newTheme = 'teal';
+    if (saldo === null || saldo === undefined) {
+        newTheme = 'silver';
+        statusText = 'Memuat';
+    } else if (saldo < 500000) {
+        newTheme = 'red';
+        statusText = 'Darurat';
+    } else if (saldo >= 500000 && saldo < 1000000) {
+        newTheme = 'yellow';
+        statusText = 'Cukup';
+    } else if (saldo >= 1000000) {
+        newTheme = 'teal';
+        statusText = 'Optimal';
+    }
+    
+    // Update status display
+    const statusElement = document.getElementById('connection-status');
+    if (statusElement && statusText) {
+        statusElement.innerHTML = `<i class="fas fa-circle"></i> <span>Status: ${statusText}</span>`;
+    }
     
     if (newTheme !== currentTheme) {
         // Tambahkan kelas changing-theme untuk efek transisi
@@ -296,6 +313,10 @@ function showLoadingState() {
     if (statusElement) {
         statusElement.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> <span>Memuat data...</span>';
     }
+    
+    // Set tema silver saat loading
+    document.body.setAttribute('data-theme', 'silver');
+    currentTheme = 'silver';
 }
 
 function updateConnectionStatus(status) {
@@ -403,7 +424,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log("🚀 [Script] Aplikasi dimulai...");
     
     // Setup awal
-    document.body.setAttribute('data-theme', 'default');
+    document.body.setAttribute('data-theme', 'silver');
     updateStatsDisplay();
     checkConnection();
     
