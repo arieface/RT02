@@ -8,27 +8,32 @@ let lastUpdateTime = null;
 let isUpdating = false;
 let updateTimer = null;
 let isInitialized = false;
-let consecutiveSameValueCount = 0; // Track nilai yang sama berturut-turut
-let lastFetchedValue = null; // Track nilai terakhir yang di-fetch
+let consecutiveSameValueCount = 0;
+let lastFetchedValue = null;
+let fetchAttempts = 0; // Track jumlah percobaan fetch
 
 // ==================== FUNGSI UTAMA ====================
 
 async function fetchAndProcessSaldo() {
     try {
-        console.log("📡 [Balance] Mengambil dari Google Sheets...");
+        fetchAttempts++;
+        console.log(`📡 [Balance] Mengambil dari Google Sheets... (Attempt #${fetchAttempts})`);
         
         // Gunakan timestamp yang lebih random untuk bypass cache
         const timestamp = Date.now() + Math.random().toString(36).substring(7);
+        
+        // HANYA gunakan header yang diizinkan Google Sheets
         const response = await fetch(`${SHEET_URL}&_=${timestamp}`, {
             cache: 'no-store',
             headers: { 
-                'Cache-Control': 'no-cache, no-store, must-revalidate',
-                'Pragma': 'no-cache',
-                'Expires': '0'
+                'Cache-Control': 'no-cache'
+                // Hapus 'Pragma' dan 'Expires' yang menyebabkan CORS error
             }
         });
         
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
         
         const text = await response.text().then(t => t.trim());
         console.log("📄 [Balance] Data mentah:", text);
@@ -85,16 +90,15 @@ async function updateSaldo() {
         
         if (newSaldo !== null) {
             // DETEKSI CACHE ISSUE
-            // Jika nilai yang sama terus muncul setelah perubahan, kemungkinan cache
             if (lastFetchedValue !== null && newSaldo === lastFetchedValue) {
                 consecutiveSameValueCount++;
                 console.log(`🔁 [Balance] Nilai sama ke-${consecutiveSameValueCount}: ${newSaldo}`);
                 
-                // Jika nilai sama muncul 2x berturut-turut setelah ada perubahan sebelumnya
-                // Skip update untuk menghindari overwrite data yang benar
+                // Jika nilai sama muncul 2x berturut-turut DAN berbeda dengan current
                 if (consecutiveSameValueCount >= 2 && currentSaldo !== null && currentSaldo !== newSaldo) {
                     console.warn(`⚠️ [Balance] Kemungkinan cache terdeteksi! Skip update.`);
                     console.log(`   Current: ${currentSaldo}, Fetched: ${newSaldo}`);
+                    isUpdating = false;
                     return;
                 }
             } else {
@@ -109,15 +113,17 @@ async function updateSaldo() {
             
             if (isValueChanged || currentSaldo === null) {
                 // Simpan ke variabel global
+                const previousSaldo = currentSaldo;
                 currentSaldo = newSaldo;
                 lastUpdateTime = new Date().toISOString();
                 
-                console.log(`💾 [Balance] Saldo ${currentSaldo === null ? 'diinisialisasi' : 'diupdate'}: ${newSaldo}`);
+                console.log(`💾 [Balance] Saldo ${previousSaldo === null ? 'diinisialisasi' : 'diupdate'}: ${previousSaldo} → ${newSaldo}`);
                 
                 // KIRIM EVENT ke script.js
                 const event = new CustomEvent('balanceUpdated', {
                     detail: {
                         saldo: newSaldo,
+                        previousSaldo: previousSaldo,
                         timestamp: lastUpdateTime,
                         formatted: new Intl.NumberFormat('id-ID').format(newSaldo),
                         isChanged: isValueChanged
@@ -180,7 +186,7 @@ async function initBalance() {
             console.log("👁️ [Balance] Tab aktif, refresh dalam 2 detik...");
             setTimeout(() => {
                 updateSaldo();
-            }, 2000); // Delay 2 detik
+            }, 2000);
         }
     });
     
@@ -202,37 +208,62 @@ async function initBalance() {
 
 // ==================== PUBLIC API ====================
 
-// Ekspor fungsi yang bisa diakses script.js
 window.BalanceSystem = {
     // Status
     isReady: () => isInitialized,
+    isUpdating: () => isUpdating,
     
     // Data
     getCurrentSaldo: () => currentSaldo,
     getLastUpdateTime: () => lastUpdateTime,
+    getLastFetchedValue: () => lastFetchedValue,
     
     // Actions
     refresh: updateSaldo,
     forceRefresh: () => {
         console.log("🔧 [Balance] Manual refresh (reset cache detection)");
-        consecutiveSameValueCount = 0; // Reset detection
+        consecutiveSameValueCount = 0;
         lastFetchedValue = null;
         updateSaldo();
     },
     
+    // Reset system
+    reset: () => {
+        console.log("🔄 [Balance] Reset sistem...");
+        currentSaldo = null;
+        lastUpdateTime = null;
+        consecutiveSameValueCount = 0;
+        lastFetchedValue = null;
+        fetchAttempts = 0;
+        console.log("✅ [Balance] Reset selesai");
+    },
+    
     // Debug
-    debug: () => ({
-        currentSaldo,
-        lastUpdateTime,
-        isUpdating,
-        isInitialized,
-        consecutiveSameValueCount,
-        lastFetchedValue
-    })
+    debug: () => {
+        const debugInfo = {
+            currentSaldo,
+            lastUpdateTime,
+            isUpdating,
+            isInitialized,
+            consecutiveSameValueCount,
+            lastFetchedValue,
+            fetchAttempts,
+            updateInterval: `${UPDATE_INTERVAL/1000}s`
+        };
+        console.table(debugInfo);
+        return debugInfo;
+    },
+    
+    // Manual fetch (untuk testing)
+    manualFetch: async () => {
+        console.log("🧪 [Balance] Manual fetch untuk testing...");
+        const result = await fetchAndProcessSaldo();
+        console.log("🧪 [Balance] Hasil manual fetch:", result);
+        return result;
+    }
 };
 
 // ==================== AUTO START ====================
-// Tunggu sedikit sebelum mulai
 setTimeout(() => {
     initialize().catch(console.error);
 }, 100);
