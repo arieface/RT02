@@ -608,19 +608,20 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('online', checkConnection);
     window.addEventListener('offline', checkConnection);
     
-    // Cek apakah balance.js sudah ada
-    if (window.BalanceSystem) {
-        console.log("⚡ [Script] Balance.js sudah loaded");
-        balanceSystemReady = true;
-        
-        // Cek jika ada data cached
-        const cachedSaldo = window.BalanceSystem.getCurrentSaldo();
-        if (cachedSaldo) {
-            console.log(`📊 [Script] Initial cached saldo: ${cachedSaldo}`);
-            lastSaldo = cachedSaldo;
-            lastUISaldo = cachedSaldo;
+// GANTI BARIS 617 DENGAN:
+if (window.BalanceSystem && typeof window.BalanceSystem.getCurrentSaldo === 'function') {
+    try {
+        const currentSaldo = window.BalanceSystem.getCurrentSaldo();
+        console.log(`⚡ [Script] Saldo from BalanceSystem: ${currentSaldo}`);
+        // Lanjutkan dengan currentSaldo jika ada
+        if (currentSaldo !== null && currentSaldo !== undefined) {
+            // Update dengan nilai dari BalanceSystem
+            updateSaldoDisplay(currentSaldo);
         }
+    } catch (error) {
+        console.error('❌ [Script] Error from BalanceSystem:', error);
     }
+}
     
     // Initial fetch dengan delay
     setTimeout(() => {
