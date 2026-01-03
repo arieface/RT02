@@ -28,7 +28,7 @@ window.addEventListener('balanceReady', () => {
     setTimeout(fetchSaldo, 500);
 });
 
-// Event 2: Data diupdate oleh balance.js
+// Event 2: Data diupdate oleh balance.js (Saldo Utama)
 window.addEventListener('balanceUpdated', (event) => {
     console.log("📬 [Script] Data baru dari balance.js:", event.detail);
     
@@ -54,6 +54,62 @@ window.addEventListener('balanceUpdated', (event) => {
         updateTime();
         
         console.log("✅ [Script] Tampilan diperbarui dari balance.js");
+    }
+});
+
+// Event 3: Data Dana Sosial Updated
+window.addEventListener('socialFundUpdated', (event) => {
+    console.log("📬 [Script] Dana Sosial diterima:", event.detail);
+    
+    const value = event.detail.value;
+    let formattedValue;
+
+    // Cek jika data kosong, null, atau 0
+    if (value === 0 || value === null || isNaN(value)) {
+        // Tampilkan 0,00 (dua desimal)
+        formattedValue = new Intl.NumberFormat('id-ID', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(0);
+    } else {
+        // Tampilkan format ribuan biasa (1.400.000)
+        formattedValue = new Intl.NumberFormat('id-ID', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(value);
+    }
+
+    const el = document.getElementById('val-dana-sosial');
+    if(el) {
+        el.textContent = formattedValue; 
+    }
+});
+
+// Event 4: Data Dana Pembangunan Updated
+window.addEventListener('devFundUpdated', (event) => {
+    console.log("📬 [Script] Dana Pembangunan diterima:", event.detail);
+    
+    const value = event.detail.value;
+    let formattedValue;
+
+    // Cek jika data kosong, null, atau 0
+    if (value === 0 || value === null || isNaN(value)) {
+        // Tampilkan 0,00 (dua desimal)
+        formattedValue = new Intl.NumberFormat('id-ID', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(0);
+    } else {
+        // Tampilkan format ribuan biasa (1.400.000)
+        formattedValue = new Intl.NumberFormat('id-ID', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(value);
+    }
+
+    const el = document.getElementById('val-dana-pembangunan');
+    if(el) {
+        el.textContent = formattedValue;
     }
 });
 

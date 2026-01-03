@@ -413,6 +413,72 @@ h1 {
     flex-shrink: 0; /* Mencegah ikon menyusut */
 }
 
+/* ==================== BARU: FUND STATUS (Dana Sosial & Pembangunan) ==================== */
+.fund-status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px; /* Diperkecil sedikit agar tidak terlalu renggang */
+    margin-top: 4px; /* Sedikit jarak dari elemen di atas */
+    margin-bottom: 4px; /* Sedikit jarak ke elemen di bawah */
+    font-size: clamp(0.7rem, 2vw, 0.75rem); /* Sama persis dengan connection-status */
+    color: var(--text-secondary);
+    opacity: 0.9;
+    text-align: center;
+    line-height: 1.2;
+    white-space: nowrap; /* Mencegah teks ke baris baru */
+    transition: color var(--transition-speed-elements) var(--transition-timing);
+}
+
+.fund-status i {
+    font-size: clamp(0.65rem, 2vw, 0.7rem);
+    color: var(--primary-color); /* Ikon mengikuti tema */
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    flex-shrink: 0;
+    transition: color var(--transition-speed-elements) var(--transition-timing);
+}
+
+.fund-label {
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+/* TAMBAHAN: Warna "Rp" mengikuti warna Saldo Utama (var(--primary-color)) */
+.fund-currency {
+    font-weight: 600; /* Agar tebal seperti saldo */
+    color: var(--primary-color); /* Mengikuti tema (Merah, Oranye, Hijau) */
+    transition: color var(--transition-speed-elements) var(--transition-timing);
+}
+
+.fund-value {
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.fund-status i {
+    font-size: clamp(0.65rem, 2vw, 0.7rem);
+    color: var(--primary-color);
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    flex-shrink: 0;
+    transition: color var(--transition-speed-elements) var(--transition-timing);
+}
+
+.fund-label {
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.fund-value {
+    font-weight: 600;
+    color: var(--text-color);
+}
+
 /* Efek kilau saldo */
 .amount {
     font-size: clamp(1.6rem, 6vw, 2rem); /* Ukuran font responsif yang lebih fleksibel */
@@ -996,7 +1062,14 @@ h1 {
         font-size: 0.85rem;
         margin-bottom: 10px;
     }
-    
+
+    /* Fund status mobile adjustments */
+    .fund-status {
+        margin-top: 3px;
+        margin-bottom: 3px;
+        font-size: 0.7rem;
+    }
+
     .connection-status {
         font-size: 0.7rem;
         flex-direction: row;

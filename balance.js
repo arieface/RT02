@@ -1,5 +1,8 @@
 // ==================== KONFIGURASI =====================
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbLFk69seIMkTsx5xGSLyOHM4Iou1uTQMNNpTnwSoWX5Yu2JBgs71Lbd9OH2Xdgq6GKR0_OiTo9shV/pub?gid=236846195&range=A100:A100&single=true&output=csv";
+const SHEET_URL_SOCIAL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTmrowEj1HMbNBtcfJOhUvDarDXuHf-suUPxtKmxMPlXe89kNXyRBsbSpotX4sNQ14bJngsjVnDgiho/pub?gid=0&single=true&output=csv";
+const SHEET_URL_DEVELOPMENT = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS_4KvXeJwe9h6neHrbJpcMerGlWfGqnBmnV-8vT_JYNXQCVpuLD01qJ8tfXvTZJx6RK0qtQ_znWpto/pub?gid=0&single=true&output=csv";
+
 const UPDATE_INTERVAL = 60000; // 1 menit
 const STABILITY_CHECK_COUNT = 3; // 3x fetch per attempt
 const STABILITY_CHECK_DELAY = 1500; // Delay antar check (1.5 detik)
@@ -14,7 +17,19 @@ let updateTimer = null;
 let isInitialized = false;
 let fetchAttempts = 0;
 
-// ==================== FUNGSI UTAMA ====================
+// Variabel untuk Dana Sosial
+let currentDanaSosial = null;
+let lastUpdateDanaSosial = null;
+let isUpdatingSosial = false;
+let updateTimerSosial = null;
+
+// Variabel untuk Dana Pembangunan
+let currentDanaPembangunan = null;
+let lastUpdateDanaPembangunan = null;
+let isUpdatingPembangunan = false;
+let updateTimerPembangunan = null;
+
+// ==================== FUNGSI UTAMA (SALDO UTAMA) ====================
 
 async function fetchAndProcessSaldo() {
     try {
@@ -184,6 +199,89 @@ async function updateSaldo() {
     }
 }
 
+// ==================== FUNGSI TAMBAHAN (DANA SOSIAL & PEMBANGUNAN) ====================
+// Logika diambil dan disesuaikan dari fungsi utama agar memiliki stabilitas yang sama
+
+// Helper untuk fetch generic dana
+async function fetchAndProcessFund(url, fundName) {
+    try {
+        console.log(`📡 [${fundName}] Mengambil data...`);
+        const timestamp = Date.now() + Math.random().toString(36).substring(7);
+        const response = await fetch(`${url}&_=${timestamp}`, {
+            cache: 'no-store',
+            headers: { 'Cache-Control': 'no-cache' }
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        
+        // PERBAIKAN: Gunakan .then(text => text.trim()) agar .trim() berfungsi
+        const text = await response.text().then(t => t.trim());
+        
+        // Cleaning data sama seperti saldo utama
+        let cleaned = text.replace(/Rp\s*/i, '').replace(/\./g, '').replace(',', '.').replace(/[^\d.-]/g, '');
+        
+        if (!cleaned) return null;
+        const val = parseFloat(cleaned);
+        return isNaN(val) ? null : val;
+    } catch (error) {
+        console.error(`❌ [${fundName}] Error:`, error.message);
+        return null;
+    }
+}
+
+// Helper stability check generic
+async function waitForStableFund(url, fundName, eventName) {
+    console.log(`🎯 [${fundName}] Menunggu data stabil...`);
+    let finalValue = null;
+
+    for (let attempt = 1; attempt <= MAX_STABILITY_ATTEMPTS; attempt++) {
+        const values = [];
+        for (let i = 0; i < STABILITY_CHECK_COUNT; i++) {
+            if (i > 0) await new Promise(r => setTimeout(r, STABILITY_CHECK_DELAY));
+            const val = await fetchAndProcessFund(url, fundName);
+            if (val !== null) values.push(val);
+        }
+
+        if (values.length > 0 && values.every(v => v === values[0])) {
+            finalValue = values[0];
+            console.log(`✅ [${fundName}] Stabil: ${finalValue}`);
+            break;
+        }
+        if (attempt < MAX_STABILITY_ATTEMPTS) {
+            await new Promise(r => setTimeout(r, RETRY_DELAY));
+        }
+    }
+
+    if (finalValue === null) {
+        // Fallback single fetch
+        finalValue = await fetchAndProcessFund(url, fundName);
+    }
+
+    if (finalValue !== null) {
+        window.dispatchEvent(new CustomEvent(eventName, {
+            detail: {
+                value: finalValue,
+                formatted: new Intl.NumberFormat('id-ID').format(finalValue)
+            }
+        }));
+    }
+}
+
+// Update Dana Sosial
+async function updateDanaSosial() {
+    if (isUpdatingSosial) return;
+    isUpdatingSosial = true;
+    await waitForStableFund(SHEET_URL_SOCIAL, "DanaSosial", "socialFundUpdated");
+    isUpdatingSosial = false;
+}
+
+// Update Dana Pembangunan
+async function updateDanaPembangunan() {
+    if (isUpdatingPembangunan) return;
+    isUpdatingPembangunan = true;
+    await waitForStableFund(SHEET_URL_DEVELOPMENT, "DanaPembangunan", "devFundUpdated");
+    isUpdatingPembangunan = false;
+}
+
 // ==================== INISIALISASI ====================
 
 async function initialize() {
@@ -208,25 +306,26 @@ async function initialize() {
 async function initBalance() {
     console.log("📦 [Balance] DOM siap, mulai setup...");
     
-    // 1. Load pertama kali
+    // 1. Load pertama kali (Saldo Utama)
     await updateSaldo();
+    // Load dana lain
+    updateDanaSosial();
+    updateDanaPembangunan();
     
     // 2. Setup auto-update setiap 1 menit
     updateTimer = setInterval(updateSaldo, UPDATE_INTERVAL);
+    updateTimerSosial = setInterval(updateDanaSosial, UPDATE_INTERVAL);
+    updateTimerPembangunan = setInterval(updateDanaPembangunan, UPDATE_INTERVAL);
     console.log(`⏰ [Balance] Auto-update diatur (${UPDATE_INTERVAL/60000} menit)`);
-    
-    // 3. Update saat tab aktif - DISABLED untuk mencegah looping
-    // document.addEventListener('visibilitychange', () => {
-    //     if (!document.hidden) {
-    //         console.log("👁️ [Balance] Tab aktif, refresh...");
-    //         setTimeout(updateSaldo, 2000);
-    //     }
-    // });
     
     // 4. Update saat online
     window.addEventListener('online', () => {
         console.log("🌐 [Balance] Online, refresh dalam 5 detik...");
-        setTimeout(updateSaldo, 5000);
+        setTimeout(() => {
+            updateSaldo();
+            updateDanaSosial();
+            updateDanaPembangunan();
+        }, 5000);
     });
     
     isInitialized = true;
@@ -252,6 +351,8 @@ window.BalanceSystem = {
     forceRefresh: () => {
         console.log("🔧 [Balance] Manual refresh");
         updateSaldo();
+        updateDanaSosial();
+        updateDanaPembangunan();
     },
     
     // Reset system
