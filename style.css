@@ -757,7 +757,7 @@ h1 {
     font-size: clamp(0.8rem, 2.5vw, 0.9rem); /* Ukuran ikon responsif */
     vertical-align: middle;
     line-height: 1;
-    flex-shrink: 0; /* Mencegah ikon menyusut */
+    flex-shrink: 0;
 }
 
 /* ==================== WATERMARK (SELALU DI ATAS) ==================== */
@@ -1503,4 +1503,10 @@ h1 {
         text-align: center;
         white-space: nowrap; /* Pertahankan satu baris */
     }
+}
+
+/* ==================== UTILITY CLASSES (TAMBAHAN) ==================== */
+.text-red {
+    color: var(--danger-color) !important;
+    font-weight: 700;
 }

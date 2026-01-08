@@ -2,6 +2,7 @@
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbLFk69seIMkTsx5xGSLyOHM4Iou1uTQMNNpTnwSoWX5Yu2JBgs71Lbd9OH2Xdgq6GKR0_OiTo9shV/pub?gid=236846195&range=A100:A100&single=true&output=csv";
 const SHEET_URL_SOCIAL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTmrowEj1HMbNBtcfJOhUvDarDXuHf-suUPxtKmxMPlXe89kNXyRBsbSpotX4sNQ14bJngsjVnDgiho/pub?gid=0&single=true&output=csv";
 const SHEET_URL_DEVELOPMENT = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS_4KvXeJwe9h6neHrbJpcMerGlWfGqnBmnV-8vT_JYNXQCVpuLD01qJ8tfXvTZJx6RK0qtQ_znWpto/pub?gid=0&single=true&output=csv";
+const SHEET_URL_LIGHTING = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR1ZZW3_kvfwtucZLvmWiRTpAxHZcvdXeCwdgxzX5ndi5MRN84PqHv4OPm7fNx2N7qoDmqWEhkBMTTu/pub?gid=0&single=true&output=csv"; // URL Baru
 
 const UPDATE_INTERVAL = 60000; // 1 menit
 const STABILITY_CHECK_COUNT = 3; // 3x fetch per attempt
@@ -28,6 +29,11 @@ let currentDanaPembangunan = null;
 let lastUpdateDanaPembangunan = null;
 let isUpdatingPembangunan = false;
 let updateTimerPembangunan = null;
+
+// Variabel untuk Data Lampu (Jumlah & Stok)
+let currentLampuData = null; // Akan menyimpan object { jumlah: 0, stok: 0 }
+let isUpdatingLampu = false;
+let updateTimerLampu = null;
 
 // ==================== FUNGSI UTAMA (SALDO UTAMA) ====================
 
@@ -282,6 +288,85 @@ async function updateDanaPembangunan() {
     isUpdatingPembangunan = false;
 }
 
+// ==================== FUNGSI BARU (DATA LAMPU) ====================
+// Mengambil data CSV, misal: "50,10" (Jumlah, Stok)
+async function fetchAndProcessLighting() {
+    try {
+        console.log(`📡 [Lighting] Mengambil data...`);
+        const timestamp = Date.now() + Math.random().toString(36).substring(7);
+        const response = await fetch(`${SHEET_URL_LIGHTING}&_=${timestamp}`, {
+            cache: 'no-store',
+            headers: { 'Cache-Control': 'no-cache' }
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        
+        const text = await response.text().then(t => t.trim());
+        console.log("📄 [Lighting] Data mentah:", text);
+        
+        // Proses CSV (bisa dipisah koma atau baris baru)
+        // Ganti koma dengan spasi lalu split untuk handle koma atau newline
+        let cleanText = text.replace(/,/g, ' ').replace(/\n/g, ' ');
+        let parts = cleanText.split(/\s+/).filter(part => part !== '');
+        
+        // Ambil 2 angka pertama yang valid
+        let numbers = parts.map(p => parseFloat(p)).filter(n => !isNaN(n));
+        
+        if (numbers.length >= 2) {
+            return { jumlah: numbers[0], stok: numbers[1] };
+        } else if (numbers.length === 1) {
+            // Jika cuma 1 angka, asumsikan itu jumlah, stok 0 atau sama
+            return { jumlah: numbers[0], stok: 0 };
+        }
+        
+        return null;
+    } catch (error) {
+        console.error(`❌ [Lighting] Error:`, error.message);
+        return null;
+    }
+}
+
+async function waitForStableLighting() {
+    console.log(`🎯 [Lighting] Menunggu data stabil...`);
+    let finalData = null;
+
+    for (let attempt = 1; attempt <= MAX_STABILITY_ATTEMPTS; attempt++) {
+        const values = [];
+        for (let i = 0; i < STABILITY_CHECK_COUNT; i++) {
+            if (i > 0) await new Promise(r => setTimeout(r, STABILITY_CHECK_DELAY));
+            const val = await fetchAndProcessLighting();
+            if (val !== null) values.push(val);
+        }
+
+        // Cek kesamaan string JSON object untuk membandingkan
+        if (values.length > 0 && values.every(v => JSON.stringify(v) === JSON.stringify(values[0]))) {
+            finalData = values[0];
+            console.log(`✅ [Lighting] Stabil:`, finalData);
+            break;
+        }
+        if (attempt < MAX_STABILITY_ATTEMPTS) {
+            await new Promise(r => setTimeout(r, RETRY_DELAY));
+        }
+    }
+
+    if (finalData === null) {
+        finalData = await fetchAndProcessLighting();
+    }
+
+    if (finalData !== null) {
+        window.dispatchEvent(new CustomEvent('lightingUpdated', {
+            detail: finalData
+        }));
+    }
+}
+
+async function updateLampu() {
+    if (isUpdatingLampu) return;
+    isUpdatingLampu = true;
+    await waitForStableLighting();
+    isUpdatingLampu = false;
+}
+
+
 // ==================== INISIALISASI ====================
 
 async function initialize() {
@@ -311,11 +396,14 @@ async function initBalance() {
     // Load dana lain
     updateDanaSosial();
     updateDanaPembangunan();
+    // Load data lampu
+    updateLampu();
     
     // 2. Setup auto-update setiap 1 menit
     updateTimer = setInterval(updateSaldo, UPDATE_INTERVAL);
     updateTimerSosial = setInterval(updateDanaSosial, UPDATE_INTERVAL);
     updateTimerPembangunan = setInterval(updateDanaPembangunan, UPDATE_INTERVAL);
+    updateTimerLampu = setInterval(updateLampu, UPDATE_INTERVAL);
     console.log(`⏰ [Balance] Auto-update diatur (${UPDATE_INTERVAL/60000} menit)`);
     
     // 4. Update saat online
@@ -325,6 +413,7 @@ async function initBalance() {
             updateSaldo();
             updateDanaSosial();
             updateDanaPembangunan();
+            updateLampu();
         }, 5000);
     });
     
@@ -353,6 +442,7 @@ window.BalanceSystem = {
         updateSaldo();
         updateDanaSosial();
         updateDanaPembangunan();
+        updateLampu();
     },
     
     // Reset system

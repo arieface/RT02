@@ -113,6 +113,34 @@ window.addEventListener('devFundUpdated', (event) => {
     }
 });
 
+// Event 5: Data Lampu Updated
+window.addEventListener('lightingUpdated', (event) => {
+    console.log("📬 [Script] Data Lampu diterima:", event.detail);
+    
+    const data = event.detail; // { jumlah: 50, stok: 10 }
+    
+    // Cari elemen stat-item yang ke-2 (Index 1)
+    const statItems = document.querySelectorAll('.stat-item');
+    if (statItems.length > 1) {
+        const lightStatItem = statItems[1];
+        const statValue = lightStatItem.querySelector('.stat-value');
+        
+        // HANYA update Value, Label sudah statis "Persediaan" di HTML
+        if (statValue) {
+            // LOGIC: Cek apakah jumlah 0
+            if (data.jumlah === 0) {
+                statValue.textContent = "Kosong";
+                // Tambahkan kelas text-red
+                statValue.classList.add('text-red');
+            } else {
+                statValue.textContent = `${data.jumlah} Buah`;
+                // Hapus kelas text-red (jika ada)
+                statValue.classList.remove('text-red');
+            }
+        }
+    }
+});
+
 // ==================== FUNGSI UTAMA ====================
 async function fetchSaldo() {
     if (isRefreshing) return;
@@ -476,27 +504,12 @@ function checkConnection() {
     }
 }
 
-function updateStatsDisplay() {
-    const statItems = document.querySelectorAll('.stat-item');
-    if (statItems.length >= 2) {
-        const timeStat = statItems[1];
-        const statValue = timeStat.querySelector('.stat-value');
-        const statLabel = timeStat.querySelector('.stat-label');
-        
-        if (statValue && statLabel) {
-            statValue.textContent = '24 Jam';
-            statLabel.textContent = 'Akses';
-        }
-    }
-}
-
 // ==================== INISIALISASI ====================
 document.addEventListener('DOMContentLoaded', function() {
     console.log("🚀 [Script] Aplikasi dimulai...");
     
     // Setup awal
     document.body.setAttribute('data-theme', 'default');
-    updateStatsDisplay();
     checkConnection();
     
     // Event listeners
