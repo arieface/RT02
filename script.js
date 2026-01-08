@@ -133,7 +133,7 @@ window.addEventListener('lightingUpdated', (event) => {
                 // Tambahkan kelas text-red
                 statValue.classList.add('text-red');
             } else {
-                statValue.textContent = `${data.jumlah} Buah`;
+                statValue.textContent = `${data.jumlah} Lampu`;
                 // Hapus kelas text-red (jika ada)
                 statValue.classList.remove('text-red');
             }
