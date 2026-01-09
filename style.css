@@ -182,7 +182,7 @@ body.changing-theme::before {
 }
 
 .card-3d {
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(255,255, 255, 0.95);
     backdrop-filter: blur(10px);
     border-radius: 24px;
     padding: 20px;
@@ -1506,7 +1506,13 @@ h1 {
 }
 
 /* ==================== UTILITY CLASSES (TAMBAHAN) ==================== */
+.text-themed {
+    color: #1e293b !important; /* Mengikuti warna tema */
+    font-weight: 700;
+    transition: color var(--transition-speed-elements) var(--transition-timing);
+}
+
 .text-red {
-    color: var(--danger-color) !important;
+    color: #ff3333 !important; /* Merah Terang */
     font-weight: 700;
 }

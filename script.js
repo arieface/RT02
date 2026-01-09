@@ -113,31 +113,45 @@ window.addEventListener('devFundUpdated', (event) => {
     }
 });
 
-// Event 5: Data Lampu Updated
+// Event 5: Data Lampu Updated (DIPERBAIKI)
 window.addEventListener('lightingUpdated', (event) => {
     console.log("📬 [Script] Data Lampu diterima:", event.detail);
     
     const data = event.detail; // { jumlah: 50, stok: 10 }
     
-    // Cari elemen stat-item yang ke-2 (Index 1)
-    const statItems = document.querySelectorAll('.stat-item');
-    if (statItems.length > 1) {
-        const lightStatItem = statItems[1];
-        const statValue = lightStatItem.querySelector('.stat-value');
-        
-        // HANYA update Value, Label sudah statis "Persediaan" di HTML
-        if (statValue) {
-            // LOGIC: Cek apakah jumlah 0
-            if (data.jumlah === 0) {
-                statValue.textContent = "Kosong";
-                // Tambahkan kelas text-red
-                statValue.classList.add('text-red');
-            } else {
-                statValue.textContent = `${data.jumlah} Lampu`;
-                // Hapus kelas text-red (jika ada)
-                statValue.classList.remove('text-red');
-            }
+    // PERBAIKAN: Temukan elemen statistik lampu dengan cara yang lebih reliable
+    const statValueElement = document.getElementById('stat-value-lighting');
+    const statLabelElement = document.getElementById('stat-label-lighting');
+    
+    if (statValueElement && statLabelElement) {
+        // PERBAIKAN: Validasi data
+        if (!data || typeof data.jumlah === 'undefined') {
+            console.warn("⚠️ [Script] Data lampu tidak valid:", data);
+            statValueElement.textContent = "Error";
+            statValueElement.classList.remove('text-themed', 'text-red');
+            statLabelElement.textContent = "Memuat...";
+            return;
         }
+        
+        const jumlahLampu = parseInt(data.jumlah) || 0;
+        
+        if (jumlahLampu === 0) {
+            // Jika 0
+            statValueElement.textContent = "Kosong";
+            statValueElement.classList.add('text-red');
+            statValueElement.classList.remove('text-themed');
+            statLabelElement.textContent = "Stok Habis";
+        } else {
+            // Jika ada data
+            statValueElement.textContent = `${jumlahLampu} Lampu`;
+            statValueElement.classList.add('text-themed');
+            statValueElement.classList.remove('text-red');
+            statLabelElement.textContent = "Tersedia⚡";
+        }
+        
+        console.log(`✅ [Script] Lighting display updated: ${jumlahLampu} Lampu`);
+    } else {
+        console.error("❌ [Script] Elemen statistik lampu tidak ditemukan");
     }
 });
 
@@ -578,6 +592,16 @@ window.forceBalanceUpdate = function() {
     if (window.BalanceSystem && window.BalanceSystem.forceRefresh) {
         window.BalanceSystem.forceRefresh();
         console.log("🔧 Manual update balance.js dipanggil");
+    } else {
+        console.warn("⚠️ BalanceSystem tidak tersedia");
+    }
+};
+
+// PERBAIKAN: Tambahkan fungsi untuk manual refresh lighting
+window.refreshLighting = function() {
+    if (window.BalanceSystem && window.BalanceSystem.refreshLighting) {
+        window.BalanceSystem.refreshLighting();
+        console.log("🔧 Manual refresh lighting dipanggil");
     } else {
         console.warn("⚠️ BalanceSystem tidak tersedia");
     }

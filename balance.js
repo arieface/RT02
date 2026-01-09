@@ -206,7 +206,6 @@ async function updateSaldo() {
 }
 
 // ==================== FUNGSI TAMBAHAN (DANA SOSIAL & PEMBANGUNAN) ====================
-// Logika diambil dan disesuaikan dari fungsi utama agar memiliki stabilitas yang sama
 
 // Helper untuk fetch generic dana
 async function fetchAndProcessFund(url, fundName) {
@@ -219,7 +218,6 @@ async function fetchAndProcessFund(url, fundName) {
         });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         
-        // PERBAIKAN: Gunakan .then(text => text.trim()) agar .trim() berfungsi
         const text = await response.text().then(t => t.trim());
         
         // Cleaning data sama seperti saldo utama
@@ -288,7 +286,7 @@ async function updateDanaPembangunan() {
     isUpdatingPembangunan = false;
 }
 
-// ==================== FUNGSI BARU (DATA LAMPU) ====================
+// ==================== FUNGSI DATA LAMPU (DIPERBAIKI) ====================
 // Mengambil data CSV, misal: "50,10" (Jumlah, Stok)
 async function fetchAndProcessLighting() {
     try {
@@ -298,27 +296,60 @@ async function fetchAndProcessLighting() {
             cache: 'no-store',
             headers: { 'Cache-Control': 'no-cache' }
         });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
         
-        const text = await response.text().then(t => t.trim());
-        console.log("📄 [Lighting] Data mentah:", text);
-        
-        // Proses CSV (bisa dipisah koma atau baris baru)
-        // Ganti koma dengan spasi lalu split untuk handle koma atau newline
-        let cleanText = text.replace(/,/g, ' ').replace(/\n/g, ' ');
-        let parts = cleanText.split(/\s+/).filter(part => part !== '');
-        
-        // Ambil 2 angka pertama yang valid
-        let numbers = parts.map(p => parseFloat(p)).filter(n => !isNaN(n));
-        
-        if (numbers.length >= 2) {
-            return { jumlah: numbers[0], stok: numbers[1] };
-        } else if (numbers.length === 1) {
-            // Jika cuma 1 angka, asumsikan itu jumlah, stok 0 atau sama
-            return { jumlah: numbers[0], stok: 0 };
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         
-        return null;
+        const text = await response.text().then(t => t.trim());
+        console.log("📄 [Lighting] Data mentah:", JSON.stringify(text));
+        
+        // PERBAIKAN: Proses data CSV lebih robust
+        let numbers = [];
+        
+        // Coba parsing sebagai CSV dengan berbagai format
+        if (text.includes(',')) {
+            // Format: "50,10" atau "50, 10"
+            numbers = text.split(',').map(item => {
+                const num = parseFloat(item.trim());
+                return isNaN(num) ? 0 : num;
+            });
+        } else if (text.includes('\n')) {
+            // Format baris baru
+            numbers = text.split('\n').map(item => {
+                const num = parseFloat(item.trim());
+                return isNaN(num) ? 0 : num;
+            });
+        } else {
+            // Cari semua angka dalam string
+            const matches = text.match(/\d+/g);
+            if (matches) {
+                numbers = matches.map(match => parseInt(match, 10));
+            }
+        }
+        
+        console.log("🔢 [Lighting] Angka ditemukan:", numbers);
+        
+        // Validasi dan return data
+        if (numbers.length >= 2) {
+            const result = { 
+                jumlah: Math.abs(numbers[0]), 
+                stok: Math.abs(numbers[1]) 
+            };
+            console.log(`✅ [Lighting] Data diproses: Jumlah=${result.jumlah}, Stok=${result.stok}`);
+            return result;
+        } else if (numbers.length === 1) {
+            const result = { 
+                jumlah: Math.abs(numbers[0]), 
+                stok: 0 
+            };
+            console.log(`⚠️ [Lighting] Hanya 1 angka ditemukan, asumsi stok=0:`, result);
+            return result;
+        } else {
+            console.warn("⚠️ [Lighting] Tidak ada angka yang valid ditemukan");
+            return null;
+        }
+        
     } catch (error) {
         console.error(`❌ [Lighting] Error:`, error.message);
         return null;
@@ -328,44 +359,85 @@ async function fetchAndProcessLighting() {
 async function waitForStableLighting() {
     console.log(`🎯 [Lighting] Menunggu data stabil...`);
     let finalData = null;
+    let attemptsMade = 0;
 
     for (let attempt = 1; attempt <= MAX_STABILITY_ATTEMPTS; attempt++) {
+        attemptsMade = attempt;
+        console.log(`🔄 [Lighting] Stability attempt ${attempt}/${MAX_STABILITY_ATTEMPTS}`);
+        
         const values = [];
         for (let i = 0; i < STABILITY_CHECK_COUNT; i++) {
-            if (i > 0) await new Promise(r => setTimeout(r, STABILITY_CHECK_DELAY));
-            const val = await fetchAndProcessLighting();
-            if (val !== null) values.push(val);
+            if (i > 0) {
+                console.log(`⏳ [Lighting] Menunggu ${STABILITY_CHECK_DELAY/1000}s sebelum check ke-${i + 1}...`);
+                await new Promise(r => setTimeout(r, STABILITY_CHECK_DELAY));
+            }
+            
+            const data = await fetchAndProcessLighting();
+            if (data !== null) {
+                values.push(data);
+                console.log(`📊 [Lighting] Check ${i + 1}/${STABILITY_CHECK_COUNT}:`, data);
+            }
         }
 
-        // Cek kesamaan string JSON object untuk membandingkan
-        if (values.length > 0 && values.every(v => JSON.stringify(v) === JSON.stringify(values[0]))) {
-            finalData = values[0];
-            console.log(`✅ [Lighting] Stabil:`, finalData);
-            break;
+        // Cek apakah semua data sama
+        if (values.length > 0) {
+            const firstValue = JSON.stringify(values[0]);
+            const allSame = values.every(v => JSON.stringify(v) === firstValue);
+            
+            if (allSame) {
+                finalData = values[0];
+                console.log(`✅ [Lighting] Data stabil ditemukan pada attempt ${attempt}:`, finalData);
+                break;
+            } else {
+                console.warn(`⚠️ [Lighting] Data tidak stabil pada attempt ${attempt}:`, values);
+            }
         }
+        
+        // Jika belum stabil dan masih ada attempt tersisa
         if (attempt < MAX_STABILITY_ATTEMPTS) {
+            console.log(`⏸️ [Lighting] Retry dalam ${RETRY_DELAY/1000}s...`);
             await new Promise(r => setTimeout(r, RETRY_DELAY));
         }
     }
 
     if (finalData === null) {
+        console.warn(`⚠️ [Lighting] Tidak dapat menemukan data stabil setelah ${attemptsMade} attempts`);
+        console.log(`🔧 [Lighting] Fallback: Menggunakan single fetch...`);
         finalData = await fetchAndProcessLighting();
     }
 
     if (finalData !== null) {
+        console.log(`🚀 [Lighting] Mengirim data stabil:`, finalData);
         window.dispatchEvent(new CustomEvent('lightingUpdated', {
             detail: finalData
+        }));
+    } else {
+        console.error(`❌ [Lighting] Gagal mendapatkan data lampu`);
+        // Kirim data default jika gagal
+        window.dispatchEvent(new CustomEvent('lightingUpdated', {
+            detail: { jumlah: 0, stok: 0 }
         }));
     }
 }
 
 async function updateLampu() {
-    if (isUpdatingLampu) return;
+    if (isUpdatingLampu) {
+        console.log("⏳ [Lighting] Update sudah berjalan...");
+        return;
+    }
+    
     isUpdatingLampu = true;
-    await waitForStableLighting();
-    isUpdatingLampu = false;
+    console.log("🔄 [Lighting] Memulai update...");
+    
+    try {
+        await waitForStableLighting();
+        console.log("✅ [Lighting] Update selesai");
+    } catch (error) {
+        console.error("❌ [Lighting] Error dalam update:", error);
+    } finally {
+        isUpdatingLampu = false;
+    }
 }
-
 
 // ==================== INISIALISASI ====================
 
@@ -394,10 +466,11 @@ async function initBalance() {
     // 1. Load pertama kali (Saldo Utama)
     await updateSaldo();
     // Load dana lain
-    updateDanaSosial();
-    updateDanaPembangunan();
-    // Load data lampu
-    updateLampu();
+    await Promise.all([
+        updateDanaSosial(),
+        updateDanaPembangunan(),
+        updateLampu()
+    ]);
     
     // 2. Setup auto-update setiap 1 menit
     updateTimer = setInterval(updateSaldo, UPDATE_INTERVAL);
@@ -406,7 +479,7 @@ async function initBalance() {
     updateTimerLampu = setInterval(updateLampu, UPDATE_INTERVAL);
     console.log(`⏰ [Balance] Auto-update diatur (${UPDATE_INTERVAL/60000} menit)`);
     
-    // 4. Update saat online
+    // 3. Update saat online
     window.addEventListener('online', () => {
         console.log("🌐 [Balance] Online, refresh dalam 5 detik...");
         setTimeout(() => {
@@ -434,6 +507,7 @@ window.BalanceSystem = {
     // Data
     getCurrentSaldo: () => currentSaldo,
     getLastUpdateTime: () => lastUpdateTime,
+    getLightingData: () => currentLampuData,
     
     // Actions
     refresh: updateSaldo,
@@ -442,6 +516,12 @@ window.BalanceSystem = {
         updateSaldo();
         updateDanaSosial();
         updateDanaPembangunan();
+        updateLampu();
+    },
+    
+    // Manual update lighting
+    refreshLighting: () => {
+        console.log("🔧 [Balance] Manual refresh lighting");
         updateLampu();
     },
     
@@ -462,6 +542,7 @@ window.BalanceSystem = {
             isUpdating,
             isInitialized,
             fetchAttempts,
+            lightingData: currentLampuData,
             updateInterval: `${UPDATE_INTERVAL/1000}s`,
             stabilityChecks: STABILITY_CHECK_COUNT,
             stabilityDelay: `${STABILITY_CHECK_DELAY/1000}s`,
@@ -476,6 +557,14 @@ window.BalanceSystem = {
     manualFetch: async () => {
         console.log("🧪 [Balance] Manual single fetch...");
         const result = await fetchAndProcessSaldo();
+        console.log("🧪 [Balance] Hasil:", result);
+        return result;
+    },
+    
+    // Test lighting fetch
+    testLightingFetch: async () => {
+        console.log("🧪 [Balance] Testing lighting fetch...");
+        const result = await fetchAndProcessLighting();
         console.log("🧪 [Balance] Hasil:", result);
         return result;
     },
